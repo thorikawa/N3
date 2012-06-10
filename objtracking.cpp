@@ -7,6 +7,8 @@
 
 #define WIDTH 480
 #define HEIGHT 360
+#define THICKNESS 3
+#define ALLOW_ERROR_COUNT 5
 
 inline CvPoint center(CvRect rect){
 	return cvPoint(rect.x+rect.width/2, rect.y+rect.height/2);
@@ -16,7 +18,6 @@ int main(int argc, char* argv[]){
 	// Set up images
 	IplImage* img = cvLoadImage("test0605.jpg");
 	cvSetImageROI(img, cvRect(84, 196, 43, 23));
-	//IplImage* back_img = cvCreateImage( cvGetSize( img ), IPL_DEPTH_8U, 1 );
 	
 	// Compute HSV image and separate into colors
 	IplImage* hsv = cvCreateImage( cvGetSize(img), IPL_DEPTH_8U, 3 );
@@ -63,6 +64,9 @@ int main(int argc, char* argv[]){
 	time(&start);
 	long long counter=0L;
 	int c;
+	bool prevfind=false;
+	int notFindCount=0;
+	CvPoint prevPoint;
 	while (1) {
 		frame = cvQueryFrame(capture);
 		//frame = img;
@@ -75,7 +79,6 @@ int main(int argc, char* argv[]){
 		IplImage* frame_planes[] = { frame_h, frame_s };
 		cvCvtPixToPlane( frame_hsv, frame_h, frame_s, frame_v, 0 );
 		
-		//IplImage* back_img = cvCreateImage(cvGetSize(frame), IPL_DEPTH_8U, 1);
 		IplImage* back_img = cvCreateImage(cvGetSize(frame), IPL_DEPTH_8U, 1);
 		
 		cvCalcBackProject(frame_planes, back_img, hist);// Calculate back projection
@@ -93,15 +96,12 @@ int main(int argc, char* argv[]){
 		CvSeq *contours = 0;
 		cvFindContours(back_img, storage, &contours, sizeof(CvContour), CV_RETR_EXTERNAL);
 				
-		//Find max contours rect
-		
-		//CvContour* maxContour;
+		//Find max contours rect		
 		CvSeq *maxContour;
 		CvRect maxRect;
 		double maxArea = 0.0F;
 		for (; contours != 0; contours = contours->h_next)
 		{
-			//cvDrawContours(cc_img, contours, ext_color, CV_RGB(0,0,0), -1, CV_FILLED, 8, cvPoint(0,0));
 			CvRect rect = cvBoundingRect(contours);
 			//printf("draw bounding: %d %d %d %d\n", rect.x, rect.y, rect.width, rect.height);
 			double area = cvContourArea(contours);
@@ -114,30 +114,23 @@ int main(int argc, char* argv[]){
 		}
 		
 		if (maxArea > 200) {
+			// find red
 			CvPoint p = center(maxRect);
-			//cvDrawContours( dst, maxContour, color, color, -1, CV_FILLED, 8);
-			cvRectangle(dst, cvPoint(p.x-2, p.y-2), cvPoint(p.x+2, p.y+2), color, 3);
-			
-			/*
-			cvRectangle (frame,
-									 cvPoint (maxRect.x, maxRect.y),
-									 cvPoint (maxRect.x + maxRect.width, maxRect.y + maxRect.height),
-									 CV_RGB (255, 255, 255),
-									 3);
-			 */
+			//cvRectangle(dst, cvPoint(p.x-2, p.y-2), cvPoint(p.x+2, p.y+2), color, 3);
+			if (prevfind){
+				cvLine(dst, prevPoint, p, color, THICKNESS);
+			} else {
+				// if there is no prev point, do nothing
+			}
+			prevPoint = p;
+			prevfind = true;
+			notFindCount=0;
+		} else {
+			if(++notFindCount >= ALLOW_ERROR_COUNT) {
+				prevfind = false;
+			}
 		}
 		
-		/*
-		for (int x=0; x<back_img->width; x++) {
-			for (int y=0; y<back_img->height; y++) {
-				uchar c = ((uchar)back_img->imageData[back_img->widthStep*y+x]);
-				printf("%d ", c);
-			}
-			printf("\n");
-		}
-		 */
-
-		//cvShowImage("Keypoint Matching", back_img);
 		cvShowImage("Keypoint Matching", dst);
 
 		//save each frame image
@@ -148,18 +141,18 @@ int main(int argc, char* argv[]){
     printf("save to %s\n", outfile);
 		 */
 		
-		//IplImage* cloneFrame = cvCloneImage(frame);
-
+		// release
+		cvReleaseImage(&frame_hsv);
 		cvReleaseImage(&frame_h);
 		cvReleaseImage(&frame_s);
 		cvReleaseImage(&frame_v);
-		
+		cvReleaseImage(&back_img);
+
 		c = cvWaitKey(2);
 		if (c == '\x1b')
 			break;
-		
-		cvReleaseImage(&back_img);
-		
+
+		// bench mark
 		time(&end);
 		++counter;
 		double sec = difftime (end, start);
