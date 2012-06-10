@@ -13,7 +13,7 @@
 #define ALLOW_ERROR_COUNT 5
 #define AREA_THRESHOLD 30
 #define APP_NAME_DRAW "draw"
-#define DEBUG 1
+#define DEBUG 0
 
 /**
  * get HS only Histogram from IplImage
