@@ -3,14 +3,17 @@
 
 #include <opencv2/opencv.hpp>
 #include "../DollarRecognizer/GeometricRecognizer.h"
+#include <vector>
 
 using namespace DollarRecognizer;
+using namespace std;
 
 namespace Apps
 {
 	class Gesture1
 	{
 	private:
+		vector<CvBox2D> boxes;
 		GeometricRecognizer g;
 		Path2D path;
 	public:

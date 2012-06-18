@@ -96,10 +96,10 @@ CvRect findMarker (IplImage** frame_planes, CvHistogram* hist, int* find) {
 	cvReleaseImage(&back_img);
 	
 	if (maxArea > AREA_THRESHOLD) {
-		printf("find! %f\n", maxArea);
+		//printf("find! %f\n", maxArea);
 		*find = 1;
 	} else {
-		printf("not find... %f\n", maxArea);
+		//printf("not find... %f\n", maxArea);
 		*find = 0;
 	}
 	return maxRect;
@@ -174,8 +174,7 @@ int main (int argc, char* argv[]) {
 		CvRect rRect = findMarker(frame_planes, rHist, &rFind);
 		CvRect yRect = findMarker(frame_planes, yHist, &yFind);
 		
-		printf("Red %d\n", rFind);
-		printf("Yel %d\n", yFind);
+		printf("R=%d Y=%d\n", rFind, yFind);
 		
 		CvPoint rc = center(rRect);
 		rc.x = rc.x * wRatio; rc.y = rc.y * hRatio;

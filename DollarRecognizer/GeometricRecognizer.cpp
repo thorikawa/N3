@@ -36,29 +36,29 @@ namespace DollarRecognizer
 	{
 		SampleGestures samples;
 
-		addTemplate("Arrow", samples.getGestureArrow());
-		addTemplate("Caret", samples.getGestureCaret());
-		addTemplate("CheckMark", samples.getGestureCheckMark());
+		//addTemplate("Arrow", samples.getGestureArrow());
+		//addTemplate("Caret", samples.getGestureCaret());
+		//addTemplate("CheckMark", samples.getGestureCheckMark());
 		addTemplate("Circle", samples.getGestureCircle());
-		addTemplate("Delete", samples.getGestureDelete());
-		addTemplate("Diamond", samples.getGestureDiamond());
+		//addTemplate("Delete", samples.getGestureDelete());
+		//addTemplate("Diamond", samples.getGestureDiamond());
 		//addTemplate("LeftCurlyBrace", samples.getGestureLeftCurlyBrace());
-		addTemplate("LeftSquareBracket", samples.getGestureLeftSquareBracket());
-		addTemplate("LeftToRightLine", samples.getGestureLeftToRightLine());
-		addTemplate("LineDownDiagonal", samples.getGestureLineDownDiagonal());
-		addTemplate("Pigtail", samples.getGesturePigtail());
-		addTemplate("QuestionMark", samples.getGestureQuestionMark());
-		addTemplate("Rectangle", samples.getGestureRectangle());
+		//addTemplate("LeftSquareBracket", samples.getGestureLeftSquareBracket());
+		//addTemplate("LeftToRightLine", samples.getGestureLeftToRightLine());
+		//addTemplate("LineDownDiagonal", samples.getGestureLineDownDiagonal());
+		//addTemplate("Pigtail", samples.getGesturePigtail());
+		//addTemplate("QuestionMark", samples.getGestureQuestionMark());
+		//addTemplate("Rectangle", samples.getGestureRectangle());
 		//addTemplate("RightCurlyBrace", samples.getGestureRightCurlyBrace());
-		addTemplate("RightSquareBracket", samples.getGestureRightSquareBracket());
-		addTemplate("RightToLeftLine", samples.getGestureRightToLeftLine());
-		addTemplate("RightToLeftLine2", samples.getGestureRightToLeftLine2());
-		addTemplate("RightToLeftSlashDown", samples.getGestureRightToLeftSlashDown());
-		addTemplate("Spiral", samples.getGestureSpiral());
-		addTemplate("Star", samples.getGestureStar());
-		addTemplate("Triangle", samples.getGestureTriangle());
-		addTemplate("V", samples.getGestureV());
-		addTemplate("X", samples.getGestureX());
+		//addTemplate("RightSquareBracket", samples.getGestureRightSquareBracket());
+		//addTemplate("RightToLeftLine", samples.getGestureRightToLeftLine());
+		//addTemplate("RightToLeftLine2", samples.getGestureRightToLeftLine2());
+		//addTemplate("RightToLeftSlashDown", samples.getGestureRightToLeftSlashDown());
+		//addTemplate("Spiral", samples.getGestureSpiral());
+		//addTemplate("Star", samples.getGestureStar());
+		//addTemplate("Triangle", samples.getGestureTriangle());
+		//addTemplate("V", samples.getGestureV());
+		//addTemplate("X", samples.getGestureX());
 	}
 
 	int GeometricRecognizer::addTemplate(string name, Path2D points)
