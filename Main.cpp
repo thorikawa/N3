@@ -59,7 +59,7 @@ CvHistogram* getHSHist (IplImage* img, CvRect rect) {
 /**
  * find rectangle which represents the marker by histogram from image
  */
-CvRect findMarker (IplImage** frame_planes, CvHistogram* hist, int* find) {
+CvRect findMarker (IplImage* img, IplImage** frame_planes, CvHistogram* hist, int* find) {
 	IplImage* back_img = cvCreateImage(cvGetSize(frame_planes[0]), IPL_DEPTH_8U, 1);
 	cvCalcBackProject(frame_planes, back_img, hist);// Calculate back projection
 	
@@ -83,6 +83,7 @@ CvRect findMarker (IplImage** frame_planes, CvHistogram* hist, int* find) {
 	for (; contours != 0; contours = contours->h_next)
 	{
 		CvRect rect = cvBoundingRect(contours);
+        cvDrawContours(img, contours, CV_RGB(255,0,0), CV_RGB(255,0,0), 0, 2);
 		//printf("draw bounding: %d %d %d %d\n", rect.x, rect.y, rect.width, rect.height);
 		double area = cvContourArea(contours);
 		if (area > maxArea) {
@@ -171,8 +172,8 @@ int main (int argc, char* argv[]) {
 
 		int rFind = 0;
 		int yFind = 0;
-		CvRect rRect = findMarker(frame_planes, rHist, &rFind);
-		CvRect yRect = findMarker(frame_planes, yHist, &yFind);
+		CvRect rRect = findMarker(dst, frame_planes, rHist, &rFind);
+		CvRect yRect = findMarker(dst, frame_planes, yHist, &yFind);
 		
 		printf("R=%d Y=%d\n", rFind, yFind);
 		

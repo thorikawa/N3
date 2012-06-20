@@ -4,6 +4,7 @@
 #include <opencv2/opencv.hpp>
 #include "../DollarRecognizer/GeometricRecognizer.h"
 #include <vector>
+#include <Box2D/Box2D.h>
 
 using namespace DollarRecognizer;
 using namespace std;
@@ -16,6 +17,8 @@ namespace Apps
 		vector<CvBox2D> boxes;
 		GeometricRecognizer g;
 		Path2D path;
+        b2World* world;
+        time_t lastTime;
 	public:
 		Gesture1();
 		void trackMarker (IplImage* destImg, CvPoint r, CvPoint b, CvPoint g, CvPoint y);
