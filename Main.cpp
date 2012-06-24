@@ -1,20 +1,16 @@
-//#include "cv.h"
-//#include "highgui.h"
 #include <opencv2/opencv.hpp>
 #include <opencv2/legacy/compat.hpp>
 #include <stdio.h>
 #include <stdlib.h>
 #include "Apps/Gesture1.h"
+#include "N3.h"
 
 #define CAPTURE_WIDTH 320
 #define CAPTURE_HEIGHT 240
-#define WIDTH 800
-#define HEIGHT 600
 #define THICKNESS 2
 #define ALLOW_ERROR_COUNT 5
 #define AREA_THRESHOLD 30
 #define APP_NAME_DRAW "draw"
-#define DEBUG 1
 
 using namespace Apps;
 
