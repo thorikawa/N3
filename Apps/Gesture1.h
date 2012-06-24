@@ -16,7 +16,6 @@ namespace Apps
   class Gesture1
   {
   private:
-    vector<CvBox2D> boxes;
     GeometricRecognizer g;
     Path2D path;
     b2World* world;

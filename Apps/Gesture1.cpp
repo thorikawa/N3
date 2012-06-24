@@ -1,13 +1,13 @@
 #include "Gesture1.h"
 #include <cmath>
 
-#define KEEP_MAX 30
+#define KEEP_MAX 10
 #define KEEP_COUNT 15
 #define NEAR_THRESHOLD 50
 #define DONT_MOVE_THRESHOLD_RATE 0.8
-#define SCORE_THRESHOLD 0.80
-#define INTERVAL_SEC 2
-#define WORLD_SCALE 5.0F
+#define SCORE_THRESHOLD 0.85
+#define INTERVAL_SEC 3
+#define WORLD_SCALE 10.0F
 
 inline Point2D toPoint2D (CvPoint p) {
   return Point2D(p.x, p.y);
@@ -49,34 +49,51 @@ namespace Apps
     //shape.Set(b2Vec2(0.0f, 150.0f), b2Vec2(1000.0f, 150.0f));
     ground->CreateFixture(&shape, 0.0f);
 
-    IplImage* srcImage = cvLoadImage("kleenex.png", CV_LOAD_IMAGE_GRAYSCALE);
+    IplImage* srcImage = cvLoadImage("kleenex_small.png", CV_LOAD_IMAGE_GRAYSCALE);
     objectDetector = new ObjectDetector();
     objectDetector->loadSourceImage(srcImage);
   }
   
   void Gesture1::trackMarker (IplImage* destImg, CvPoint _r, CvPoint _b, CvPoint _g, CvPoint _y) {
     
+    // find tissue box!
     CvPoint* objPoints = objectDetector->detect(destImg);
-    if (objPoints != NULL) {
-      cvFillConvexPoly (destImg, objPoints, 4, CV_RGB(0, 255, 255), CV_AA, 0);
-      for (int i=0; i<4; i++) {
-        cvCircle(destImg, objPoints[i], 3, CV_RGB(0,255,0), -1);
-      }
-    }
 
     // draw
-    world->Step(1.0F/12.0F, 10, 10);
+    world->Step(1.0F/6.0F, 10, 10);
     cvLine(destImg, cvPoint(0,HEIGHT), cvPoint(1000,HEIGHT), CV_RGB(0,255,0), 3);
     for (b2Body* b = world->GetBodyList(); b; b = b->GetNext()) {
-      printf("**draw body\n");
+      //printf("**draw body\n");
       Box2DData* userData = (Box2DData*)b->GetUserData();
       if (userData != NULL) {
-        //b2Vec2 v = b->GetWorldCenter();
-        b2Vec2 v = b->GetPosition();
-        printf("** x=%f y=%f r=%f\n", v.x, v.y, userData->radius);
-        CvPoint center = cvPoint(v.x*WORLD_SCALE, v.y*WORLD_SCALE);
-        cvCircle(destImg, center, userData->radius*WORLD_SCALE, CV_RGB(255,0,0), -1);
+        if (strcmp(userData->type, "Circle") == 0) {
+          //b2Vec2 v = b->GetWorldCenter();
+          b2Vec2 v = b->GetPosition();
+          //printf("** x=%f y=%f r=%f\n", v.x, v.y, userData->radius);
+          CvPoint center = cvPoint(v.x*WORLD_SCALE, v.y*WORLD_SCALE);
+          cvCircle(destImg, center, userData->radius*WORLD_SCALE, CV_RGB(255,0,0), -1);
+        } else if (strcmp(userData->type, "Box") == 0) {
+          world->DestroyBody(b);
+        }
       }      
+    }
+    if (objPoints != NULL) {
+      printf("construct body\n");
+      b2PolygonShape cs;
+      b2Vec2 vertices[4] = {
+        b2Vec2((float)(objPoints[0].x)/WORLD_SCALE, (float)(objPoints[0].y)/WORLD_SCALE),
+        b2Vec2((float)(objPoints[1].x)/WORLD_SCALE, (float)(objPoints[1].y)/WORLD_SCALE),
+        b2Vec2((float)(objPoints[2].x)/WORLD_SCALE, (float)(objPoints[2].y)/WORLD_SCALE),
+        b2Vec2((float)(objPoints[3].x)/WORLD_SCALE, (float)(objPoints[3].y)/WORLD_SCALE)
+      };
+      cs.Set(vertices, 4);
+      b2BodyDef bd;
+      //bd.type = b2_staticBody;
+      Box2DData* obj = new Box2DData();
+      strcpy(obj->type, "Box");
+      bd.userData = obj;
+      b2Body* body1 = world->CreateBody(&bd);
+      body1->CreateFixture(&cs, 0.0f);
     }
 
     if (_r.x < 0) return;
@@ -132,25 +149,27 @@ namespace Apps
       CvBox2D ellipse = cvFitEllipse2(seq);
       float radius = std::min(ellipse.size.width, ellipse.size.height)/(4.0F*WORLD_SCALE);
       cvEllipseBox(destImg, ellipse, CV_RGB(0,255,255), -1);
-      //boxes.push_back(ellipse);
 
       // add Box2D object
-      b2CircleShape cs;
-      cs.m_radius = radius;
-      printf(" x=%f y=%f radius:%f\n", ellipse.center.x/WORLD_SCALE, ellipse.center.y/WORLD_SCALE, radius);
-      b2BodyDef bd;
-      bd.type = b2_dynamicBody;
-      bd.position.Set(ellipse.center.x/WORLD_SCALE, ellipse.center.y/WORLD_SCALE);
-      Box2DData* obj = new Box2DData();
-      obj->radius = radius;
-      bd.userData = obj;
-      b2Body* body1 = world->CreateBody(&bd);
-      b2FixtureDef fixtureDef;
-      fixtureDef.shape = &cs;
-      fixtureDef.density = 1.0f;
-      fixtureDef.friction = 0.3f;
-      fixtureDef.restitution = 0.6f;
-      body1->CreateFixture(&fixtureDef);
+      {
+        b2CircleShape cs;
+        cs.m_radius = radius;
+        printf(" x=%f y=%f radius:%f\n", ellipse.center.x/WORLD_SCALE, ellipse.center.y/WORLD_SCALE, radius);
+        b2BodyDef bd;
+        bd.type = b2_dynamicBody;
+        bd.position.Set(ellipse.center.x/WORLD_SCALE, ellipse.center.y/WORLD_SCALE);
+        Box2DData* obj = new Box2DData();
+        strcpy(obj->type, "Circle");
+        obj->radius = radius;
+        bd.userData = obj;
+        b2Body* body1 = world->CreateBody(&bd);
+        b2FixtureDef fixtureDef;
+        fixtureDef.shape = &cs;
+        fixtureDef.density = 1.0f;
+        fixtureDef.friction = 0.3f;
+        fixtureDef.restitution = 0.6f;
+        body1->CreateFixture(&fixtureDef);
+      }
 
       time(&lastTime);
 

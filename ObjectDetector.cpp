@@ -115,9 +115,10 @@ CvPoint* ObjectDetector::detect (IplImage* destImage) {
   CvSURFParams params = cvSURFParams(500, 1);
   
   cvExtractSURF(destImage, 0, &destKeyPoints, &destDescriptors, storage, params);
+  if (destKeyPoints->total < 5) return NULL;
   
-  printf("srcNumber: %d\n", srcDescriptors->total);
-  printf("destNumber: %d\n", destDescriptors->total);
+  //printf("srcNumber: %d\n", srcDescriptors->total);
+  //printf("destNumber: %d\n", destDescriptors->total);
 
   // 特徴ベクトルの類似度が高いキーポイント同士を線でつなぐ
   vector<int> ptpairs;
@@ -129,7 +130,7 @@ CvPoint* ObjectDetector::detect (IplImage* destImage) {
   
   findPairs(srcKeyPoints, srcDescriptors, destKeyPoints, destDescriptors, srcPoints, dstPoints);
   int n = srcPoints.size();
-  printf("matched points: %d\n", n);
+  //printf("matched points: %d\n", n);
   if (n < (srcKeyPoints->total/15)) return NULL;
 
   srcMat = cvMat(1, n, CV_32FC2, &srcPoints[0]);
@@ -142,12 +143,14 @@ CvPoint* ObjectDetector::detect (IplImage* destImage) {
   }
   
   // print homograpy
+  /*
   for (int i=0; i<3; i++) {
     for (int j=0; j<3; j++) {
       printf("%f,", CV_MAT_ELEM(homography, double, i, j));
     }
     printf("\n");
   }
+   */
   // 4隅のホモグラフィ変換後の座標を求める
   CvPoint *cornerPts2 = (CvPoint *) cvAlloc (sizeof (CvPoint) * 4);
   CvPoint *pts = (CvPoint *) cvAlloc (sizeof (CvPoint) * 4);
@@ -156,9 +159,8 @@ CvPoint* ObjectDetector::detect (IplImage* destImage) {
   double xs[4] = {0, srcWidth, srcWidth, 0};
   double ys[4] = {0, 0, srcHeight, srcHeight};
   CvSeq* res;
-  res = cvCreateSeq (CV_SEQ_ELTYPE_POINT , sizeof (CvSeq), sizeof (CvPoint), storage);
   for (int i=0; i<4; i++) {
-    printf("warp (%f,%f)\n", xs[i], ys[i]);
+    //printf("warp (%f,%f)\n", xs[i], ys[i]);
     cornerPts2[i].x = xs[i];
     cornerPts2[i].y = ys[i];
     
@@ -175,7 +177,7 @@ CvPoint* ObjectDetector::detect (IplImage* destImage) {
     //cvSeqPush(res, &p);
     pts[i].x = (int)(x/z);
     pts[i].y = (int)(y/z);
-    printf(" => (%d,%d)\n", pts[i].x, pts[i].y);
+    //printf(" => (%d,%d)\n", pts[i].x, pts[i].y);
   }
 
   // 後始末
