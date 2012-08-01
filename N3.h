@@ -3,6 +3,6 @@
 
 #define WIDTH 800
 #define HEIGHT 600
-#define DEBUG 1
+#define DEBUG 0
 
 #endif

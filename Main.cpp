@@ -2,13 +2,13 @@
 #include <opencv2/legacy/compat.hpp>
 #include <stdio.h>
 #include <stdlib.h>
+#include "Apps/Draw.h"
 #include "Apps/Gesture1.h"
+#include "Apps/Gunman.h"
 #include "N3.h"
 
 #define CAPTURE_WIDTH 320
 #define CAPTURE_HEIGHT 240
-#define THICKNESS 2
-#define ALLOW_ERROR_COUNT 5
 #define AREA_THRESHOLD 30
 #define APP_NAME_DRAW "draw"
 
@@ -129,7 +129,6 @@ int main (int argc, char* argv[]) {
 	time_t start, end;
 	
 	IplImage *dst = cvCreateImage( cvSize(WIDTH, HEIGHT), IPL_DEPTH_8U, 3);
-	CvScalar color = CV_RGB(255,255,255);
 	
 	//CvCapture* capture = cvCreateCameraCapture(CV_CAP_ANY);
 	CvCapture* capture = cvCreateCameraCapture(0);
@@ -140,10 +139,9 @@ int main (int argc, char* argv[]) {
 	time(&start);
 	long long counter=0L;
 	int c;
-	bool prevfind=false;
-	int notFindCount=0;
-	CvPoint prevPoint;
 	Gesture1 gesture1 = Gesture1();
+  Gunman gunman = Gunman();
+  Draw draw = Draw();
 	
 	cvNamedWindow(APP_NAME_DRAW,0);
 	
@@ -184,11 +182,13 @@ int main (int argc, char* argv[]) {
 		if(!rFind) rc.x = -1;
 		if(!yFind) yc.x = -1;
 #if DEBUG
-		//if(rFind) cvRectangle(dst, cvPoint(rc.x-2, rc.y-2), cvPoint(rc.x+2, rc.y+2), CV_RGB(255,0,0), 3);
-		//if(yFind) cvRectangle(dst, cvPoint(yc.x-2, yc.y-2), cvPoint(yc.x+2, yc.y+2), CV_RGB(0,255,0), 3);
+		if(rFind) cvRectangle(dst, cvPoint(rc.x-2, rc.y-2), cvPoint(rc.x+2, rc.y+2), CV_RGB(255,0,0), 3);
+		if(yFind) cvRectangle(dst, cvPoint(yc.x-2, yc.y-2), cvPoint(yc.x+2, yc.y+2), CV_RGB(0,255,0), 3);
 #endif
 
-		gesture1.trackMarker(dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
+		//gesture1.trackMarker(dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
+    //gunman.trackMarker(dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
+    draw.trackMarker(dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
 
 		cvShowImage(APP_NAME_DRAW, dst);
 		//cvSetWindowProperty(APP_NAME_DRAW, CV_WND_PROP_FULLSCREEN,CV_WINDOW_FULLSCREEN);
