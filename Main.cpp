@@ -5,10 +5,9 @@
 #include "Apps/Draw.h"
 #include "Apps/Gesture1.h"
 #include "Apps/Gunman.h"
+#include "Apps/PaperDraw.h"
 #include "N3.h"
 
-#define CAPTURE_WIDTH 320
-#define CAPTURE_HEIGHT 240
 #define AREA_THRESHOLD 30
 #define APP_NAME_DRAW "draw"
 
@@ -131,9 +130,9 @@ int main (int argc, char* argv[]) {
 	IplImage *dst = cvCreateImage( cvSize(WIDTH, HEIGHT), IPL_DEPTH_8U, 3);
 	
 	//CvCapture* capture = cvCreateCameraCapture(CV_CAP_ANY);
-	CvCapture* capture = cvCreateCameraCapture(0);
-	cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH, CAPTURE_WIDTH);
-	cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT, CAPTURE_HEIGHT);
+	CvCapture* capture = cvCreateCameraCapture(1);
+	cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH, IN_WIDTH);
+	cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT, IN_HEIGHT);
 	IplImage *frame = 0;
 	
 	time(&start);
@@ -142,13 +141,14 @@ int main (int argc, char* argv[]) {
 	Gesture1 gesture1 = Gesture1();
   Gunman gunman = Gunman();
   Draw draw = Draw();
+  PaperDraw paperDraw = PaperDraw();
 	
 	cvNamedWindow(APP_NAME_DRAW,0);
 	
-	double wRatio = (double)WIDTH / (double)CAPTURE_WIDTH;
-	double hRatio = (double)HEIGHT / (double)CAPTURE_HEIGHT;
+	double wRatio = (double)WIDTH / (double)IN_WIDTH;
+	double hRatio = (double)HEIGHT / (double)IN_HEIGHT;
 	
-	CvSize captureSize = cvSize(CAPTURE_WIDTH, CAPTURE_HEIGHT);
+	CvSize captureSize = cvSize(IN_WIDTH, IN_HEIGHT);
 	IplImage* frame_hsv = cvCreateImage(captureSize, IPL_DEPTH_8U, 3);
 	IplImage* frame_h = cvCreateImage(captureSize, 8, 1);
 	IplImage* frame_s = cvCreateImage(captureSize, 8, 1);
@@ -188,17 +188,20 @@ int main (int argc, char* argv[]) {
 
 		//gesture1.trackMarker(dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
     //gunman.trackMarker(dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
-    draw.trackMarker(dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
+    //draw.trackMarker(dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
+    paperDraw.trackMarker(frame, dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
 
 		cvShowImage(APP_NAME_DRAW, dst);
-		//cvSetWindowProperty(APP_NAME_DRAW, CV_WND_PROP_FULLSCREEN,CV_WINDOW_FULLSCREEN);
+		cvSetWindowProperty(APP_NAME_DRAW, CV_WND_PROP_FULLSCREEN,CV_WINDOW_FULLSCREEN);
 		//cvResizeWindow(APP_NAME_DRAW, WIDTH, HEIGHT);
 
 		//save each frame image
+    /*
     char outfile[256];
     sprintf(outfile, "/workspace/N3/images/track%03d.jpg", fileIndex++);
     int res = cvSaveImage(outfile, dst);
     printf("save to %s\n", outfile);
+     */
 		
 		// release
 
