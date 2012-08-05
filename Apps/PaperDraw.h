@@ -22,6 +22,7 @@ namespace Apps
     double *storage;
     CvMat homography;
     double wRatio, hRatio;
+    int skipCount;
 	public:
 		PaperDraw();
 		void trackMarker (IplImage* inputImage, IplImage *destImg, CvPoint r, CvPoint b, CvPoint g, CvPoint y);

@@ -157,7 +157,7 @@ int main (int argc, char* argv[]) {
 	
 	while (1) {
 		frame = cvQueryFrame(capture);
-		cvFlip (frame, frame, 1);
+		//cvFlip (frame, frame, 1);
 		//dst = frame;
 #if DEBUG
 		cvResize(frame, dst);
