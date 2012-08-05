@@ -1,4 +1,7 @@
+ifeq ($(strip $(OPENCV_HOME)),)
+#default OPENCV_HOME
 OPENCV_HOME=/usr/local/opencv-2.4.1
+endif
 
 N3: Main.o GeometricRecognizer.o Gesture1.o Gunman.o Draw.o PaperDraw.o ObjectDetector.o
 	g++ -L$(OPENCV_HOME)/lib -LBox2D/Build/Box2D -lopencv_core -lopencv_highgui -lopencv_features2d -lopencv_imgproc -lopencv_legacy -lopencv_nonfree -lopencv_calib3d -lBox2D Main.o GeometricRecognizer.o Gesture1.o Gunman.o Draw.o ObjectDetector.o PaperDraw.o -o N3 
@@ -28,4 +31,6 @@ TestBox2D: TestBox2D.cpp
 TestGlut: TestGlut.cpp
 	#g++ -LBox2D/Build/freeglut -I/usr/X11/include -L/usr/X11/lib -lfreeglut_static -lGL -lGLU -lGLUT -lX11 TestGlut.cpp -o TestGlut
 	g++  -I/System/Library/Frameworks/GLUT.framework/Headers -framework GLUT -framework OpenGL -lobjc TestGlut.cpp -o TestGlut
-	
+
+clean:
+	rm *.o N3
