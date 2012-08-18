@@ -32,5 +32,8 @@ TestGlut: TestGlut.cpp
 	#g++ -LBox2D/Build/freeglut -I/usr/X11/include -L/usr/X11/lib -lfreeglut_static -lGL -lGLU -lGLUT -lX11 TestGlut.cpp -o TestGlut
 	g++  -I/System/Library/Frameworks/GLUT.framework/Headers -framework GLUT -framework OpenGL -lobjc TestGlut.cpp -o TestGlut
 
+Dummy3D: Dummy3D.cpp
+	g++ -I/System/Library/Frameworks/GLUT.framework/Headers -I$(OPENCV_HOME)/include -L$(OPENCV_HOME)/lib -LBox2D/Build/Box2D -lopencv_core -lopencv_highgui -lopencv_features2d -lopencv_imgproc -lopencv_legacy -lopencv_objdetect -framework GLUT -framework OpenGL -lobjc Dummy3D.cpp -o Dummy3D
+
 clean:
 	rm *.o N3
