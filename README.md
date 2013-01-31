@@ -20,7 +20,9 @@ Each application is defined under  *Apps* folder. Currently the following applic
 
 * Draw : Simple draw application
 * PaperDraw : Improved draw application.
+DEMO: http://www.youtube.com/watch?v=iHSEzvneSeU
 * Gesture1 : Gesture recognition and physical world simulation
+DEMO: http://www.youtube.com/watch?v=W5x79DQyPiE
 
 ##Technology
 We use C++ (tessted on Mac OS 10.7.3) with OpenCV
