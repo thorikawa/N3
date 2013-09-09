@@ -3,8 +3,8 @@ ifeq ($(strip $(OPENCV_HOME)),)
 OPENCV_HOME=/usr/local/opencv-2.4.1
 endif
 
-N3: Main.o GeometricRecognizer.o Gesture1.o Gunman.o Draw.o PaperDraw.o ObjectDetector.o
-	g++ -L$(OPENCV_HOME)/lib -LBox2D/Build/Box2D -lopencv_core -lopencv_highgui -lopencv_features2d -lopencv_imgproc -lopencv_legacy -lopencv_nonfree -lopencv_calib3d -lBox2D Main.o GeometricRecognizer.o Gesture1.o Gunman.o Draw.o ObjectDetector.o PaperDraw.o -o N3 
+N3: Main.o GeometricRecognizer.o Gesture1.o Gunman.o Draw.o PaperDraw.o Tracker.o ObjectDetector.o
+	g++ -L$(OPENCV_HOME)/lib -LBox2D/Build/Box2D -lopencv_core -lopencv_highgui -lopencv_features2d -lopencv_imgproc -lopencv_legacy -lopencv_nonfree -lopencv_calib3d -lBox2D Main.o GeometricRecognizer.o Gesture1.o Gunman.o Draw.o ObjectDetector.o PaperDraw.o Tracker.o -o N3 
 GeometricRecognizer.o: DollarRecognizer/GeometricRecognizer.cpp
 	g++ -c DollarRecognizer/GeometricRecognizer.cpp
 Gesture1.o: Apps/Gesture1.cpp
@@ -13,8 +13,10 @@ Gunman.o: Apps/Gunman.cpp
 	g++ -c -I$(OPENCV_HOME)/include -IBox2D Apps/Gunman.cpp
 Draw.o: Apps/Draw.cpp
 	g++ -c -I$(OPENCV_HOME)/include Apps/Draw.cpp
-PaperDraw.o: Apps/PaperDraw.cpp Apps/PaperDraw.h N3.h
+PaperDraw.o: Apps/PaperDraw.cpp
 	g++ -c -I$(OPENCV_HOME)/include Apps/PaperDraw.cpp
+Tracker.o: Apps/Tracker.cpp
+	g++ -c -I$(OPENCV_HOME)/include -IBox2D Apps/Tracker.cpp
 ObjectRecognizer.o: ObjectRecognizer.cpp
 	g++ -c -I$(OPENCV_HOME)/include ObjectRecognizer.cpp
 ObjectDetector.o: ObjectDetector.cpp
