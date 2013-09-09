@@ -20,7 +20,7 @@ OBJS=${SRCS:%.cpp=${BUILD_DIR}/%.o}
 
 N3: $(OBJS)
 	${CXX} ${LDFLAGS} ${OBJS} -o N3 
-bin/%.o : %.cpp
+${BUILD_DIR}/%.o : %.cpp
 	@mkdir -p $(dir $@)
 	${CXX} ${CXXFLAGS} -c $< -o $@
 
