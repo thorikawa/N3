@@ -6,9 +6,20 @@ endif
 CXX=g++
 CXXFLAGS=-I$(OPENCV_HOME)/include -IBox2D
 LDFLAGS=-L${OPENCV_HOME}/lib -LBox2D/Build/Box2D -lopencv_core -lopencv_highgui -lopencv_features2d -lopencv_imgproc -lopencv_legacy -lopencv_nonfree -lopencv_calib3d -lBox2D
+BUILD_DIR=bin
+SRCS= \
+	Main.cpp \
+	DollarRecognizer/GeometricRecognizer.cpp \
+	Apps/Gesture1.cpp \
+	Apps/Gunman.cpp \
+	Apps/Draw.cpp \
+	Apps/PaperDraw.cpp \
+	Apps/Tracker.cpp \
+	ObjectDetector.cpp
+OBJS=${SRCS:%.cpp=${BUILD_DIR}/%.o}
 
-N3: bin/Main.o bin/DollarRecognizer/GeometricRecognizer.o bin/Apps/Gesture1.o bin/Apps/Gunman.o bin/Apps/Draw.o bin/Apps/PaperDraw.o bin/Apps/Tracker.o bin/ObjectDetector.o
-	${CXX} ${LDFLAGS} bin/Main.o bin/DollarRecognizer/GeometricRecognizer.o bin/Apps/Gesture1.o bin/Apps/Gunman.o bin/Apps/Draw.o bin/Apps/PaperDraw.o bin/Apps/Tracker.o bin/ObjectDetector.o -o N3 
+N3: $(OBJS)
+	${CXX} ${LDFLAGS} ${OBJS} -o N3 
 bin/%.o : %.cpp
 	@mkdir -p $(dir $@)
 	${CXX} ${CXXFLAGS} -c $< -o $@
