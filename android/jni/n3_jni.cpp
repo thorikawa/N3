@@ -1,0 +1,117 @@
+#include <n3_jni.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/contrib/detection_based_tracker.hpp>
+
+#include <string>
+#include <vector>
+
+#include <android/log.h>
+
+#define LOG_TAG "N3/Native"
+#define LOGD(...) ((void)__android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__))
+
+using namespace std;
+using namespace cv;
+
+inline void vector_Rect_to_Mat(vector<Rect>& v_rect, Mat& mat) {
+	mat = Mat(v_rect, true);
+}
+
+JNIEXPORT jlong JNICALL Java_com_polysfactory_n3_demo_N3_nativeCreateObject(
+		JNIEnv * jenv, jclass) {
+	LOGD("Java_com_polysfactory_n3_demo_N3_nativeCreateObject enter");
+
+	try {
+	} catch (cv::Exception& e) {
+		LOGD("nativeCreateObject caught cv::Exception: %s", e.what());
+		jclass je = jenv->FindClass("org/opencv/core/CvException");
+		if (!je)
+			je = jenv->FindClass("java/lang/Exception");
+		jenv->ThrowNew(je, e.what());
+	} catch (...) {
+		LOGD("nativeCreateObject caught unknown exception");
+		jclass je = jenv->FindClass("java/lang/Exception");
+		jenv->ThrowNew(je,
+				"Unknown exception in JNI code {highgui::VideoCapture_n_1VideoCapture__()}");
+		return 0;
+	}
+
+	LOGD("Java_com_polysfactory_n3_demo_N3_nativeCreateObject exit");
+	return 0;
+}
+
+JNIEXPORT void JNICALL Java_com_polysfactory_n3_demo_N3_nativeDestroyObject(
+		JNIEnv * jenv, jclass, jlong thiz) {
+	LOGD("Java_com_polysfactory_n3_demo_N3_nativeDestroyObject enter");
+	try {
+	} catch (cv::Exception& e) {
+		LOGD("nativeestroyObject caught cv::Exception: %s", e.what());
+		jclass je = jenv->FindClass("org/opencv/core/CvException");
+		if (!je)
+			je = jenv->FindClass("java/lang/Exception");
+		jenv->ThrowNew(je, e.what());
+	} catch (...) {
+		LOGD("nativeDestroyObject caught unknown exception");
+		jclass je = jenv->FindClass("java/lang/Exception");
+		jenv->ThrowNew(je,
+				"Unknown exception in JNI code {highgui::VideoCapture_n_1VideoCapture__()}");
+	}
+	LOGD("Java_com_polysfactory_n3_demo_N3_nativeDestroyObject exit");
+}
+
+JNIEXPORT void JNICALL Java_com_polysfactory_n3_demo_N3_nativeStart(
+		JNIEnv * jenv, jclass, jlong thiz) {
+	LOGD("Java_com_polysfactory_n3_demo_N3_nativeStart enter");
+	try {
+	} catch (cv::Exception& e) {
+		LOGD("nativeStart caught cv::Exception: %s", e.what());
+		jclass je = jenv->FindClass("org/opencv/core/CvException");
+		if (!je)
+			je = jenv->FindClass("java/lang/Exception");
+		jenv->ThrowNew(je, e.what());
+	} catch (...) {
+		LOGD("nativeStart caught unknown exception");
+		jclass je = jenv->FindClass("java/lang/Exception");
+		jenv->ThrowNew(je,
+				"Unknown exception in JNI code {highgui::VideoCapture_n_1VideoCapture__()}");
+	}
+	LOGD("Java_com_polysfactory_n3_demo_N3_nativeStart exit");
+}
+
+JNIEXPORT void JNICALL Java_com_polysfactory_n3_demo_N3_nativeStop(
+		JNIEnv * jenv, jclass, jlong thiz) {
+	LOGD("Java_com_polysfactory_n3_demo_N3_nativeStop enter");
+	try {
+	} catch (cv::Exception& e) {
+		LOGD("nativeStop caught cv::Exception: %s", e.what());
+		jclass je = jenv->FindClass("org/opencv/core/CvException");
+		if (!je)
+			je = jenv->FindClass("java/lang/Exception");
+		jenv->ThrowNew(je, e.what());
+	} catch (...) {
+		LOGD("nativeStop caught unknown exception");
+		jclass je = jenv->FindClass("java/lang/Exception");
+		jenv->ThrowNew(je,
+				"Unknown exception in JNI code {highgui::VideoCapture_n_1VideoCapture__()}");
+	}
+	LOGD("Java_com_polysfactory_n3_demo_N3_nativeStop exit");
+}
+
+JNIEXPORT void JNICALL Java_com_polysfactory_n3_demo_N3_nativeProcess(
+		JNIEnv * jenv, jclass, jlong thiz, jlong imageGray, jlong imageRgba) {
+	LOGD("Java_com_polysfactory_n3_demo_N3_nativeDetect enter");
+	try {
+	} catch (cv::Exception& e) {
+		LOGD("nativeCreateObject caught cv::Exception: %s", e.what());
+		jclass je = jenv->FindClass("org/opencv/core/CvException");
+		if (!je)
+			je = jenv->FindClass("java/lang/Exception");
+		jenv->ThrowNew(je, e.what());
+	} catch (...) {
+		LOGD("nativeDetect caught unknown exception");
+		jclass je = jenv->FindClass("java/lang/Exception");
+		jenv->ThrowNew(je,
+				"Unknown exception in JNI code {highgui::VideoCapture_n_1VideoCapture__()}");
+	}
+	LOGD("Java_com_polysfactory_n3_demo_N3_nativeDetect exit");
+}
