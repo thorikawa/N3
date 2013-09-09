@@ -2,16 +2,16 @@
 #include "../N3.h"
 
 namespace Apps
-{	
-	PaperDraw::PaperDraw ():notFindCount(0),prevfind(false),color(CV_RGB(255,255,255)),phase(0),skipCount(0) {
+{  
+  PaperDraw::PaperDraw ():notFindCount(0),prevfind(false),color(CV_RGB(255,255,255)),phase(0),skipCount(0) {
     chessboard = cvLoadImage("chessboard.jpg");
     storage = (double*)malloc(sizeof(double)*9);
     homography = cvMat(3, 3, CV_64F, storage);
     wRatio = (double)WIDTH / (double)IN_WIDTH;
     hRatio = (double)HEIGHT / (double)IN_HEIGHT;
-	}
-	
-	void PaperDraw::trackMarker (IplImage* inputImage, IplImage* destImage, CvPoint _r, CvPoint _b, CvPoint _g, CvPoint _y) {
+  }
+  
+  void PaperDraw::trackMarker (IplImage* inputImage, IplImage* destImage, CvPoint _r, CvPoint _b, CvPoint _g, CvPoint _y) {
     //cvFlip(inputImage, NULL, 1);
     switch (phase) {
       case 0: {
@@ -136,7 +136,7 @@ namespace Apps
       default:
       break;
     }
-	}
+  }
   
   CvPoint PaperDraw::convertCoordinates (CvPoint p) {
     CvMat *src = cvCreateMat(3, 1, CV_64F);
