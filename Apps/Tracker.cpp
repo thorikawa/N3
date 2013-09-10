@@ -46,7 +46,7 @@ namespace Apps
         // do we need it?
         //cvNormalizeHist(hist, 1.0); // Normalize it
         
-        //threshold(backProject, backProject, 30, 255, CV_THRESH_BINARY);
+        threshold(backProject, backProject, 30, 255, CV_THRESH_BINARY);
         
         //cvMorphologyEx(back_img, back_img, 0, 0, CV_MOP_OPEN);
         //cvMorphologyEx(back_img, back_img, 0, 0, CV_MOP_CLOSE);
@@ -61,13 +61,12 @@ namespace Apps
         //Find max contours rect
         Rect maxRect;
         double maxArea = 0.0F;
-        printf("contours %zu\n", contours.size());
         for (int i = 0; i < contours.size(); i++) {
             Rect rect = boundingRect(Mat(contours[i]));
 #if DEBUG
             drawContours(img, contours, i, Scalar(255, 255, 255), 2, 8, hierarchy, 0, Point(0, 0));
 #endif
-            printf("draw bounding: %d %d %d %d\n", rect.x, rect.y, rect.width, rect.height);
+            // printf("draw bounding: %d %d %d %d\n", rect.x, rect.y, rect.width, rect.height);
             double area = contourArea(contours[i]);
             if (area > maxArea) {
                 maxRect = rect;
