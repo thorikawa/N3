@@ -37,7 +37,7 @@ int main (int argc, char* argv[]) {
         tracker->process(frame, dst);
 
         imshow(APP_NAME_DRAW, dst);
-        setWindowProperty(APP_NAME_DRAW, CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
+        //setWindowProperty(APP_NAME_DRAW, CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
         //cvResizeWindow(APP_NAME_DRAW, WIDTH, HEIGHT);
 
         //save each frame image
