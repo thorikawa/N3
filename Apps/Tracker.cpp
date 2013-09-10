@@ -127,23 +127,28 @@ namespace Apps
         cvReleaseImage(&frame_v);
     }
 
-    void Tracker::process (IplImage* src, IplImage* dst) {
+    void Tracker::process (Mat &msrc, Mat &mdst) {
+        IplImage src = msrc;
+        IplImage dst = mdst;
+
+        IplImage* psrc = &src;
+        IplImage* pdst = &dst;
         //cvFlip (frame, frame, 1);
         //dst = frame;
 #if DEBUG
-        cvResize(src, dst);
+        cvResize(psrc, pdst);
 #endif
 
-        cvCvtColor(src, frame_hsv, CV_BGR2HSV);
+        cvCvtColor(psrc, frame_hsv, CV_BGR2HSV);
         cvCvtPixToPlane( frame_hsv, frame_h, frame_s, frame_v, 0 );
 
         int rFind = 0;
         int yFind = 0;
         IplImage* frame_planes[] = { frame_h, frame_s };
-        CvRect rRect = findMarker(dst, frame_planes, rHist, &rFind);
+        CvRect rRect = findMarker(pdst, frame_planes, rHist, &rFind);
         //CvRect yRect = findMarker(dst, frame_planes, yHist, &yFind);
         CvRect yRect = cvRect(0,0,0,0);
-        
+
         printf("R=%d Y=%d\n", rFind, yFind);
 
         CvPoint rc = center(rRect);
@@ -154,13 +159,13 @@ namespace Apps
         if(!rFind) rc.x = -1;
         if(!yFind) yc.x = -1;
 #if DEBUG
-        if(rFind) cvRectangle(dst, cvPoint(rc.x-2, rc.y-2), cvPoint(rc.x+2, rc.y+2), CV_RGB(255,0,0), 3);
-        if(yFind) cvRectangle(dst, cvPoint(yc.x-2, yc.y-2), cvPoint(yc.x+2, yc.y+2), CV_RGB(0,255,0), 3);
+        if(rFind) cvRectangle(pdst, cvPoint(rc.x-2, rc.y-2), cvPoint(rc.x+2, rc.y+2), CV_RGB(255,0,0), 3);
+        if(yFind) cvRectangle(pdst, cvPoint(yc.x-2, yc.y-2), cvPoint(yc.x+2, yc.y+2), CV_RGB(0,255,0), 3);
 #endif
 
         //gesture1.trackMarker(dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
         //gunman.trackMarker(dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
-        draw->trackMarker(dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
+        draw->trackMarker(pdst, rc, yc, cvPoint(0,0), cvPoint(0,0));
         //paperDraw.trackMarker(frame, dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
     }
 }

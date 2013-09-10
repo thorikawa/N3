@@ -19,26 +19,25 @@ int main (int argc, char* argv[]) {
 
     // benchmark
     time_t start, end;
-    
-    //CvCapture* capture = cvCreateCameraCapture(CV_CAP_ANY);
-    CvCapture* capture = cvCreateCameraCapture(0);
-    cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_WIDTH, IN_WIDTH);
-    cvSetCaptureProperty(capture, CV_CAP_PROP_FRAME_HEIGHT, IN_HEIGHT);
-    IplImage *frame = 0;
-    IplImage *dst = cvCreateImage(cvSize(WIDTH, HEIGHT), IPL_DEPTH_8U, 3);
+
+    VideoCapture capture(0);
+    capture.set(CV_CAP_PROP_FRAME_WIDTH, IN_WIDTH);
+    capture.set(CV_CAP_PROP_FRAME_HEIGHT, IN_HEIGHT);
+    Mat frame;
+    Mat dst(WIDTH, HEIGHT, CV_8UC(3));
     
     time(&start);
     long long counter=0L;
     int c;
     
-    cvNamedWindow(APP_NAME_DRAW,0);
+    namedWindow(APP_NAME_DRAW,0);
     
     while (1) {
-        frame = cvQueryFrame(capture);
+        capture >> frame;
         tracker->process(frame, dst);
 
-        cvShowImage(APP_NAME_DRAW, dst);
-        cvSetWindowProperty(APP_NAME_DRAW, CV_WND_PROP_FULLSCREEN,CV_WINDOW_FULLSCREEN);
+        imshow(APP_NAME_DRAW, dst);
+        setWindowProperty(APP_NAME_DRAW, CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
         //cvResizeWindow(APP_NAME_DRAW, WIDTH, HEIGHT);
 
         //save each frame image
@@ -51,7 +50,7 @@ int main (int argc, char* argv[]) {
         
         // release
 
-        c = cvWaitKey(2);
+        c = waitKey(2);
         if (c == '\x1b') {
             break;
         }
@@ -59,13 +58,11 @@ int main (int argc, char* argv[]) {
         // bench mark
         time(&end);
         ++counter;
-        double sec = difftime (end, start);
+        double sec = difftime(end, start);
         double fps = counter / sec;
         printf("FPS = %.2f\n", fps);
 
     }
-
-    cvReleaseCapture(&capture);
     
     return 0;
 }

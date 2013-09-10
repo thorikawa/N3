@@ -7,6 +7,7 @@
 #include "Draw.h"
 
 using namespace std;
+using namespace cv;
 
 namespace Apps
 {
@@ -24,7 +25,7 @@ namespace Apps
     public:
         Tracker(string imageFileName);
         ~Tracker();
-        void process (IplImage* src, IplImage* dst);
+        void process (Mat &src, Mat &dst);
   };
 }
 
