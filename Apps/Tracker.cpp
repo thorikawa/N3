@@ -96,11 +96,6 @@ namespace Apps
         Mat img = imread(imageFileName);
         getHSHist(img, Rect(446, 294, 50, 50), rHist);
         getHSHist(img, Rect(532, 40, 50, 50), yHist);
-        for (int i=0; i<256; i++)
-        {
-            float hist_value = rHist.at<float>(i);
-            printf("%f,", hist_value);
-        }
 
         //Gesture1 gesture1 = Gesture1();
         draw = new Draw();
