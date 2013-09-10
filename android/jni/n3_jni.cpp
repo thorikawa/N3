@@ -1,4 +1,5 @@
 #include <n3_jni.h>
+#include <Tracker.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/contrib/detection_based_tracker.hpp>
 
@@ -12,16 +13,20 @@
 
 using namespace std;
 using namespace cv;
+using namespace Apps;
 
 inline void vector_Rect_to_Mat(vector<Rect>& v_rect, Mat& mat) {
 	mat = Mat(v_rect, true);
 }
 
 JNIEXPORT jlong JNICALL Java_com_polysfactory_n3_demo_N3_nativeCreateObject(
-		JNIEnv * jenv, jclass) {
+		JNIEnv * jenv, jclass, jstring jFileName) {
 	LOGD("Java_com_polysfactory_n3_demo_N3_nativeCreateObject enter");
-
+    const char* jnamestr = jenv->GetStringUTFChars(jFileName, NULL);
+    string stdFileName(jnamestr);
+	jlong tracker;
 	try {
+		tracker = (jlong) new Tracker(stdFileName);
 	} catch (cv::Exception& e) {
 		LOGD("nativeCreateObject caught cv::Exception: %s", e.what());
 		jclass je = jenv->FindClass("org/opencv/core/CvException");
@@ -37,7 +42,7 @@ JNIEXPORT jlong JNICALL Java_com_polysfactory_n3_demo_N3_nativeCreateObject(
 	}
 
 	LOGD("Java_com_polysfactory_n3_demo_N3_nativeCreateObject exit");
-	return 0;
+	return tracker;
 }
 
 JNIEXPORT void JNICALL Java_com_polysfactory_n3_demo_N3_nativeDestroyObject(
@@ -101,6 +106,7 @@ JNIEXPORT void JNICALL Java_com_polysfactory_n3_demo_N3_nativeProcess(
 		JNIEnv * jenv, jclass, jlong thiz, jlong imageGray, jlong imageRgba) {
 	LOGD("Java_com_polysfactory_n3_demo_N3_nativeDetect enter");
 	try {
+		((Tracker*)thiz)->process(*((Mat*)imageRgba), *((Mat*)imageRgba));
 	} catch (cv::Exception& e) {
 		LOGD("nativeCreateObject caught cv::Exception: %s", e.what());
 		jclass je = jenv->FindClass("org/opencv/core/CvException");

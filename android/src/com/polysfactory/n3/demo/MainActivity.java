@@ -1,5 +1,7 @@
 package com.polysfactory.n3.demo;
 
+import java.io.File;
+
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
@@ -19,6 +21,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         if (!OpenCVLoader.initDebug()) {
             // Handle initialization error
         } else {
+            System.loadLibrary("n3_apps");
             System.loadLibrary("n3");
         }
     }
@@ -31,6 +34,8 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
 
     private CameraBridgeViewBase mOpenCvCameraView;
 
+    private File mMarkerImage;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,6 +47,8 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
 
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.fd_activity_surface_view);
         mOpenCvCameraView.setCvCameraViewListener(this);
+
+        mMarkerImage = IOUtils.copy(this, R.raw.rby0610, "images", "rby0610.jpg");
     }
 
     @Override
@@ -59,7 +66,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     @Override
     public void onResume() {
         super.onResume();
-        mNativeDetector = new N3();
+        mNativeDetector = new N3(mMarkerImage.getAbsolutePath());
         mNativeDetector.start();
         if (mOpenCvCameraView != null) {
             mOpenCvCameraView.enableView();
@@ -85,6 +92,8 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
 
         mRgba = inputFrame.rgba();
         mGray = inputFrame.gray();
+        Log.d(TAG, "cols:" + mRgba.cols());
+        Log.d(TAG, "rows:" + mRgba.rows());
 
         if (mNativeDetector != null) {
             mNativeDetector.process(mGray, mRgba);
