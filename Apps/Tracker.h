@@ -2,11 +2,9 @@
 #define _GUNMAN_H_
 
 #include <opencv2/opencv.hpp>
+#include <opencv2/legacy/compat.hpp>
 #include "../N3.h"
 #include "Draw.h"
-#include "Gesture1.h"
-#include "Gunman.h"
-#include "PaperDraw.h"
 
 using namespace std;
 

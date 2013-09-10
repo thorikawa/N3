@@ -1,5 +1,4 @@
 #include <opencv2/opencv.hpp>
-#include <opencv2/legacy/compat.hpp>
 #include <stdio.h>
 #include <stdlib.h>
 #include "Apps/Tracker.h"
