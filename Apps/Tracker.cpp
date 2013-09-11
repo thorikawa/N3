@@ -85,8 +85,8 @@ namespace Apps
     /**
      * find center of CvRect
      */
-    inline CvPoint center (CvRect rect) {
-        return cvPoint(rect.x+rect.width/2, rect.y+rect.height/2);
+    inline Point center (Rect rect) {
+        return Point(rect.x+rect.width/2, rect.y+rect.height/2);
     }
 
     void Tracker::init () {
@@ -136,9 +136,9 @@ namespace Apps
 
         printf("R=%d Y=%d\n", rFind, yFind);
 
-        Point rc = Point(rRect.x + rRect.width/2, rRect.x + rRect.height/2);
+        Point rc = center(rRect);
         rc.x = rc.x * wRatio; rc.y = rc.y * hRatio;
-        Point yc = Point(yRect.x + yRect.width/2, yRect.x + yRect.height/2);
+        Point yc = center(yRect);
         yc.x = yc.x * wRatio; yc.y = yc.y * hRatio;
 
         if(!rFind) rc.x = -1;
