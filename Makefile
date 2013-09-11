@@ -9,6 +9,7 @@ LDFLAGS=-L${OPENCV_HOME}/lib -LBox2D/Build/Box2D -lopencv_core -lopencv_highgui 
 BUILD_DIR=bin
 SRCS= \
 	Main.cpp \
+	MarkerManager.cpp \
 	DollarRecognizer/GeometricRecognizer.cpp \
 	Apps/Gesture1.cpp \
 	Apps/Gunman.cpp \

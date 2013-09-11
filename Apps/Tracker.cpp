@@ -6,13 +6,10 @@ namespace Apps
     /**
      * get HS only Histogram from IplImage
      */
-    void getHSHist(Mat& img, Rect rect, MatND& hist) {
-        Mat roi = img(rect);
-
-        Size size = roi.size();
+    void getHSHist(Mat& img, MatND& hist) {
         // Compute HSV image and separate into colors
         Mat hsv;
-        cvtColor(roi, hsv, CV_BGR2HSV);
+        cvtColor(img, hsv, CV_BGR2HSV);
 
         // copied the code from fancy demo linked from here:
         // http://docs.opencv.org/doc/tutorials/imgproc/histograms/back_projection/back_projection.html
@@ -92,18 +89,32 @@ namespace Apps
         return cvPoint(rect.x+rect.width/2, rect.y+rect.height/2);
     }
 
-    Tracker::Tracker (string imageFileName) {
-        Mat img = imread(imageFileName);
-        getHSHist(img, Rect(446, 294, 50, 50), rHist);
-        getHSHist(img, Rect(532, 40, 50, 50), yHist);
+    void Tracker::init () {
+        wRatio = (double)WIDTH / (double)IN_WIDTH;
+        hRatio = (double)HEIGHT / (double)IN_HEIGHT;
 
         //Gesture1 gesture1 = Gesture1();
         draw = new Draw();
         //PaperDraw paperDraw = PaperDraw();
+    }
 
-        Size captureSize(IN_WIDTH, IN_HEIGHT);
-        wRatio = (double)WIDTH / (double)IN_WIDTH;
-        hRatio = (double)HEIGHT / (double)IN_HEIGHT;
+    Tracker::Tracker (string imageFileName) {
+        Mat image = imread(imageFileName);
+        Mat rImage = image(Rect(446, 294, 50, 50));
+        Mat yImage = image(Rect(532, 40, 50, 50));
+        getHSHist(rImage, rHist);
+        getHSHist(yImage, yHist);
+
+        init();
+    }
+
+    Tracker::Tracker(string rImageFile, string yImageFile)  {
+        Mat rImage = imread(rImageFile);
+        Mat yImage = imread(yImageFile);
+        getHSHist(rImage, rHist);
+        getHSHist(yImage, yHist);
+
+        init();
     }
 
     Tracker::~Tracker() {
@@ -112,10 +123,10 @@ namespace Apps
     void Tracker::process (Mat& src, Mat& dst) {
         //cvFlip (frame, frame, 1);
         //dst = frame;
-        src.copyTo(dst);
-#if DEBUG
-        //resize(src, dst);
-#endif
+
+        //src.copyTo(dst);
+        resize(src, dst, Size(WIDTH, HEIGHT));
+
 
         int rFind = 0;
         int yFind = 0;

@@ -18,7 +18,7 @@ namespace Apps
     Scalar color;
 	public:
 		Draw();
-		void trackMarker (Mat& destImg, Point& r, Point& b, Point& g, Point& y);
+		void trackMarker (Mat& destImg, Point& _r, Point& _b, Point& _g, Point& _y);
 	};	
 }
 

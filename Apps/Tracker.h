@@ -18,8 +18,10 @@ namespace Apps
         Draw* draw;
         double wRatio;
         double hRatio;
+        void init ();
     public:
         Tracker(string imageFileName);
+        Tracker(string rMarkerImage, string yMarkerImage);
         ~Tracker();
         void process (Mat &src, Mat &dst);
   };

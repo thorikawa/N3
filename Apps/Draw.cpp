@@ -14,9 +14,9 @@ namespace Apps
 			} else {
 				// if there is no prev point, do nothing
 			}
-			prevPoint = _r;
+			prevPoint = Point(_r);
 			prevfind = true;
-			notFindCount=0;
+			notFindCount = 0;
 		} else {
 			if(++notFindCount >= ALLOW_ERROR_COUNT) {
 				prevfind = false;
