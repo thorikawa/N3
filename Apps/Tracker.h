@@ -13,17 +13,15 @@ namespace Apps
 {
     class Tracker {
     private:
-        CvHistogram* rHist;
-        CvHistogram* yHist;
-        IplImage* frame_hsv;
-        IplImage* frame_h;
-        IplImage* frame_s;
-        IplImage* frame_v;
+        MatND rHist;
+        MatND yHist;
         Draw* draw;
         double wRatio;
         double hRatio;
+        void init ();
     public:
         Tracker(string imageFileName);
+        Tracker(string rMarkerImage, string yMarkerImage);
         ~Tracker();
         void process (Mat &src, Mat &dst);
   };

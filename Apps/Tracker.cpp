@@ -6,82 +6,70 @@ namespace Apps
     /**
      * get HS only Histogram from IplImage
      */
-    CvHistogram* getHSHist (IplImage* img, CvRect rect) {
-        cvSetImageROI(img, rect);
-        
+    void getHSHist(Mat& img, MatND& hist) {
         // Compute HSV image and separate into colors
-        IplImage* hsv = cvCreateImage(cvGetSize(img), IPL_DEPTH_8U, 3);
-        
-        cvCvtColor(img, hsv, CV_BGR2HSV);
-        
-        IplImage* h_plane = cvCreateImage(cvGetSize( img ), 8, 1);
-        IplImage* s_plane = cvCreateImage(cvGetSize( img ), 8, 1);
-        IplImage* v_plane = cvCreateImage(cvGetSize( img ), 8, 1);
-        IplImage* planes[] = { h_plane, s_plane };
-        cvCvtPixToPlane(hsv, h_plane, s_plane, v_plane, 0);
-        
+        Mat hsv;
+        cvtColor(img, hsv, CV_BGR2HSV);
+
+        // copied the code from fancy demo linked from here:
+        // http://docs.opencv.org/doc/tutorials/imgproc/histograms/back_projection/back_projection.html
         // Build and fill the histogram
-        int h_bins = 30, s_bins = 32;
-        CvHistogram* hist;
-        {
-            int hist_size[] = { h_bins, s_bins };
-            float h_ranges[] = { 0, 180 };
-            float s_ranges[] = { 0, 255 };
-            float* ranges[] = { h_ranges, s_ranges };
-            hist = cvCreateHist( 2, hist_size, CV_HIST_ARRAY, ranges, 1 );
-        }
-        cvCalcHist(planes, hist, 0, 0); // Compute histogram
-        cvNormalizeHist(hist, 20*255); // Normalize it
+        int hbins = 30, sbins = 32;
+        int histSize[] = { hbins, sbins };
+        float hranges[] = { 0, 179 };
+        float sranges[] = { 0, 255 };
+        const float* ranges[] = { hranges, sranges };
+        int channels[] = {0, 1};
+        calcHist(&hsv, 1, channels, Mat(), // do not use mask
+                 hist, 2, histSize, ranges);
         
-        cvReleaseImage(&h_plane);
-        cvReleaseImage(&s_plane);
-        cvReleaseImage(&v_plane);
-        cvResetImageROI(img);
-        
-        return hist;
+        return;
     }
 
     /**
      * find rectangle which represents the marker by histogram from image
      */
-    CvRect findMarker (IplImage* img, IplImage** frame_planes, CvHistogram* hist, int* find) {
-        IplImage* back_img = cvCreateImage(cvGetSize(frame_planes[0]), IPL_DEPTH_8U, 1);
-        cvCalcBackProject(frame_planes, back_img, hist);// Calculate back projection
+    Rect findMarker (Mat& img, MatND& hist, int* find) {
+        Mat hsv;
+        cvtColor(img, hsv, CV_BGR2HSV);
+        Mat backProject(hsv.size(), CV_8UC1);
+        float hranges[] = { 0, 179 };
+        float sranges[] = { 0, 255 };
+        const float* ranges[] = { hranges, sranges };
+        int channels[] = {0, 1};
+        calcBackProject(&hsv, 1, channels, hist, backProject, ranges, 1, true);// Calculate back projection
         
         // do we need it?
         //cvNormalizeHist(hist, 1.0); // Normalize it
         
-        cvThreshold(back_img,back_img,30,255,CV_THRESH_BINARY);
+        threshold(backProject, backProject, 30, 255, CV_THRESH_BINARY);
         
         //cvMorphologyEx(back_img, back_img, 0, 0, CV_MOP_OPEN);
         //cvMorphologyEx(back_img, back_img, 0, 0, CV_MOP_CLOSE);
-        cvSmooth(back_img, back_img);
         
-        CvMemStorage *storage = cvCreateMemStorage ();
-        CvSeq *contours = 0;
-        cvFindContours(back_img, storage, &contours, sizeof(CvContour), CV_RETR_EXTERNAL);
+        // XXX: do we need it?
+        //GaussianBlur(backProject, backProject, backProject.size());
+        
+        vector<vector<Point> > contours;
+        vector<Vec4i> hierarchy;
+        findContours(backProject, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
         
         //Find max contours rect
-        CvSeq *maxContour;
-        CvRect maxRect;
+        Rect maxRect;
         double maxArea = 0.0F;
-        for (; contours != 0; contours = contours->h_next)
-        {
-            CvRect rect = cvBoundingRect(contours);
+        for (int i = 0; i < contours.size(); i++) {
+            Rect rect = boundingRect(Mat(contours[i]));
 #if DEBUG
-            //cvDrawContours(img, contours, CV_RGB(255,0,0), CV_RGB(255,0,0), 0, 2);
+            drawContours(img, contours, i, Scalar(255, 255, 255), 2, 8, hierarchy, 0, Point(0, 0));
 #endif
-            //printf("draw bounding: %d %d %d %d\n", rect.x, rect.y, rect.width, rect.height);
-            double area = cvContourArea(contours);
+            // printf("draw bounding: %d %d %d %d\n", rect.x, rect.y, rect.width, rect.height);
+            double area = contourArea(contours[i]);
             if (area > maxArea) {
-                maxContour = contours;
                 maxRect = rect;
                 maxArea = area;
             }
             //printf("area: %f\n", area);
         }
-        
-        cvReleaseImage(&back_img);
         
         if (maxArea > AREA_THRESHOLD) {
             //printf("find! %f\n", maxArea);
@@ -96,76 +84,73 @@ namespace Apps
     /**
      * find center of CvRect
      */
-    inline CvPoint center (CvRect rect) {
-        return cvPoint(rect.x+rect.width/2, rect.y+rect.height/2);
+    inline Point center (Rect rect) {
+        return Point(rect.x+rect.width/2, rect.y+rect.height/2);
     }
 
-    Tracker::Tracker (string imageFileName) {
-        IplImage* img = cvLoadImage(imageFileName.c_str());
-        //CvHistogram* hist = getHSHist(img, cvRect(84, 196, 43, 23));
-        rHist = getHSHist(img, cvRect(446, 294, 50, 50));
-        //CvHistogram* yHist = getHSHist(img, cvRect(441, 127, 50, 50));
-        yHist = getHSHist(img, cvRect(532, 40, 50, 50));
+    void Tracker::init () {
+        wRatio = (double)WIDTH / (double)IN_WIDTH;
+        hRatio = (double)HEIGHT / (double)IN_HEIGHT;
 
         //Gesture1 gesture1 = Gesture1();
         draw = new Draw();
         //PaperDraw paperDraw = PaperDraw();
+    }
 
-        CvSize captureSize = cvSize(IN_WIDTH, IN_HEIGHT);
-        frame_hsv = cvCreateImage(captureSize, IPL_DEPTH_8U, 3);
-        frame_h = cvCreateImage(captureSize, 8, 1);
-        frame_s = cvCreateImage(captureSize, 8, 1);
-        frame_v = cvCreateImage(captureSize, 8, 1);
-        wRatio = (double)WIDTH / (double)IN_WIDTH;
-        hRatio = (double)HEIGHT / (double)IN_HEIGHT;
+    Tracker::Tracker (string imageFileName) {
+        Mat image = imread(imageFileName);
+        Mat rImage = image(Rect(446, 294, 50, 50));
+        Mat yImage = image(Rect(532, 40, 50, 50));
+        getHSHist(rImage, rHist);
+        getHSHist(yImage, yHist);
+
+        init();
+    }
+
+    Tracker::Tracker(string rImageFile, string yImageFile)  {
+        Mat rImage = imread(rImageFile);
+        Mat yImage = imread(yImageFile);
+        getHSHist(rImage, rHist);
+        getHSHist(yImage, yHist);
+
+        init();
     }
 
     Tracker::~Tracker() {
-        cvReleaseImage(&frame_hsv);
-        cvReleaseImage(&frame_h);
-        cvReleaseImage(&frame_s);
-        cvReleaseImage(&frame_v);
     }
 
-    void Tracker::process (Mat &msrc, Mat &mdst) {
-        IplImage src = msrc;
-        IplImage dst = mdst;
-
-        IplImage* psrc = &src;
-        IplImage* pdst = &dst;
+    void Tracker::process (Mat& src, Mat& dst) {
         //cvFlip (frame, frame, 1);
         //dst = frame;
-#if DEBUG
-        cvResize(psrc, pdst);
-#endif
 
-        cvCvtColor(psrc, frame_hsv, CV_BGR2HSV);
-        cvCvtPixToPlane( frame_hsv, frame_h, frame_s, frame_v, 0 );
+        //src.copyTo(dst);
+        resize(src, dst, Size(WIDTH, HEIGHT));
+
 
         int rFind = 0;
         int yFind = 0;
-        IplImage* frame_planes[] = { frame_h, frame_s };
-        CvRect rRect = findMarker(pdst, frame_planes, rHist, &rFind);
+        Rect rRect = findMarker(src, rHist, &rFind);
         //CvRect yRect = findMarker(dst, frame_planes, yHist, &yFind);
-        CvRect yRect = cvRect(0,0,0,0);
+        Rect yRect = Rect(0,0,0,0);
 
         printf("R=%d Y=%d\n", rFind, yFind);
 
-        CvPoint rc = center(rRect);
+        Point rc = center(rRect);
         rc.x = rc.x * wRatio; rc.y = rc.y * hRatio;
-        CvPoint yc = center(yRect);
+        Point yc = center(yRect);
         yc.x = yc.x * wRatio; yc.y = yc.y * hRatio;
 
         if(!rFind) rc.x = -1;
         if(!yFind) yc.x = -1;
 #if DEBUG
-        if(rFind) cvRectangle(pdst, cvPoint(rc.x-2, rc.y-2), cvPoint(rc.x+2, rc.y+2), CV_RGB(255,0,0), 3);
-        if(yFind) cvRectangle(pdst, cvPoint(yc.x-2, yc.y-2), cvPoint(yc.x+2, yc.y+2), CV_RGB(0,255,0), 3);
+        if(rFind) rectangle(dst, Point(rc.x-2, rc.y-2), Point(rc.x+2, rc.y+2), CV_RGB(255,0,0), 3);
+        if(yFind) rectangle(dst, Point(yc.x-2, yc.y-2), Point(yc.x+2, yc.y+2), CV_RGB(0,255,0), 3);
 #endif
 
+        Point zp = Point(0,0);
         //gesture1.trackMarker(dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
         //gunman.trackMarker(dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
-        draw->trackMarker(pdst, rc, yc, cvPoint(0,0), cvPoint(0,0));
+        draw->trackMarker(dst, rc, yc, zp, zp);
         //paperDraw.trackMarker(frame, dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
     }
 }

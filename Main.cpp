@@ -1,19 +1,39 @@
 #include <opencv2/opencv.hpp>
 #include <stdio.h>
 #include <stdlib.h>
+#include "MarkerManager.h"
 #include "Apps/Tracker.h"
 #include "N3.h"
 
 #define APP_NAME_DRAW "draw"
 
 using namespace Apps;
+using namespace N3;
 
 /**
  * Main
  */
 int main (int argc, char* argv[]) {
+    bool skipDetectMarker = false;
+
+    int c;
+    while((c =  getopt(argc, argv, "s")) != EOF) {
+        switch (c) {
+            case 's':
+                skipDetectMarker = true;
+                break;
+            default:
+                break;
+        }
+    }
+
+    if (!skipDetectMarker) {
+        MarkerManager::start("marker.jpg");
+    }
+
     // Set up images
-    Tracker* tracker = new Tracker("rby0610.jpg");
+    //Tracker* tracker = new Tracker("rby0610.jpg");
+    Tracker* tracker = new Tracker("marker.jpg", "marker.jpg");
 
     int fileIndex = 0;
 
@@ -28,7 +48,6 @@ int main (int argc, char* argv[]) {
     
     time(&start);
     long long counter=0L;
-    int c;
     
     namedWindow(APP_NAME_DRAW,0);
     
@@ -37,7 +56,7 @@ int main (int argc, char* argv[]) {
         tracker->process(frame, dst);
 
         imshow(APP_NAME_DRAW, dst);
-        setWindowProperty(APP_NAME_DRAW, CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
+        //setWindowProperty(APP_NAME_DRAW, CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
         //cvResizeWindow(APP_NAME_DRAW, WIDTH, HEIGHT);
 
         //save each frame image

@@ -3,6 +3,8 @@
 
 #include <opencv2/opencv.hpp>
 
+using namespace cv;
+
 namespace Apps
 {
 	class Draw
@@ -12,11 +14,11 @@ namespace Apps
     const static int THICKNESS = 2;
     int notFindCount;
     bool prevfind;
-    CvPoint prevPoint;
-    CvScalar color;
+    Point prevPoint;
+    Scalar color;
 	public:
 		Draw();
-		void trackMarker (IplImage *destImg, CvPoint r, CvPoint b, CvPoint g, CvPoint y);
+		void trackMarker (Mat& destImg, Point& _r, Point& _b, Point& _g, Point& _y);
 	};	
 }
 

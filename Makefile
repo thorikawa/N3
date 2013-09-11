@@ -4,11 +4,12 @@ OPENCV_HOME=/usr/local/opencv-2.4.1
 endif
 
 CXX=g++
-CXXFLAGS=-I$(OPENCV_HOME)/include -IBox2D
+CXXFLAGS=-I$(OPENCV_HOME)/include -IBox2D -g
 LDFLAGS=-L${OPENCV_HOME}/lib -LBox2D/Build/Box2D -lopencv_core -lopencv_highgui -lopencv_features2d -lopencv_imgproc -lopencv_legacy -lopencv_nonfree -lopencv_calib3d -lBox2D
 BUILD_DIR=bin
 SRCS= \
 	Main.cpp \
+	MarkerManager.cpp \
 	DollarRecognizer/GeometricRecognizer.cpp \
 	Apps/Gesture1.cpp \
 	Apps/Gunman.cpp \
