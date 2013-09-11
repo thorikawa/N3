@@ -22,7 +22,6 @@ namespace Apps
         int channels[] = {0, 1};
         calcHist(&hsv, 1, channels, Mat(), // do not use mask
                  hist, 2, histSize, ranges);
-        normalize(hist, hist, 0, 255, NORM_MINMAX, -1, Mat());
         
         return;
     }
