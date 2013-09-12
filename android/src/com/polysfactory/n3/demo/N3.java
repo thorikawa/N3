@@ -15,8 +15,8 @@ public class N3 {
         nativeStop(mNativeObj);
     }
 
-    public void process(Mat imageGray, Mat imageRgba) {
-        nativeProcess(mNativeObj, imageGray.getNativeObjAddr(), imageRgba.getNativeObjAddr());
+    public void process(Mat imageRgba) {
+        nativeProcess(mNativeObj, imageRgba.getNativeObjAddr());
     }
 
     public void release() {
@@ -34,5 +34,5 @@ public class N3 {
 
     private static native void nativeStop(long thiz);
 
-    private static native void nativeProcess(long thiz, long imageGray, long imageRgba);
+    private static native void nativeProcess(long thiz, long imageRgba);
 }

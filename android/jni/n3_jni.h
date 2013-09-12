@@ -42,10 +42,10 @@ JNIEXPORT void JNICALL Java_com_polysfactory_n3_demo_N3_nativeStop
 /*
  * Class:     com_polysfactory_n3_demo_N3
  * Method:    nativeProcess
- * Signature: (JJJ)V
+ * Signature: (JJ)V
  */
 JNIEXPORT void JNICALL Java_com_polysfactory_n3_demo_N3_nativeProcess
-  (JNIEnv *, jclass, jlong, jlong, jlong);
+  (JNIEnv *, jclass, jlong, jlong);
 
 #ifdef __cplusplus
 }

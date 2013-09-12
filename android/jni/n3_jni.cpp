@@ -103,7 +103,7 @@ JNIEXPORT void JNICALL Java_com_polysfactory_n3_demo_N3_nativeStop(
 }
 
 JNIEXPORT void JNICALL Java_com_polysfactory_n3_demo_N3_nativeProcess(
-		JNIEnv * jenv, jclass, jlong thiz, jlong imageGray, jlong imageRgba) {
+		JNIEnv * jenv, jclass, jlong thiz, jlong imageRgba) {
 	LOGD("Java_com_polysfactory_n3_demo_N3_nativeDetect enter");
 	try {
 		((Tracker*)thiz)->process(*((Mat*)imageRgba), *((Mat*)imageRgba));

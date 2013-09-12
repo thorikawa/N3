@@ -4,8 +4,8 @@
     android:layout_height="match_parent" >
 
     <org.opencv.android.JavaCameraView
-        android:layout_width="320px"
-        android:layout_height="240px"
+        android:layout_width="320dp"
+        android:layout_height="240dp"
         android:id="@+id/fd_activity_surface_view" />
 
 </LinearLayout>
