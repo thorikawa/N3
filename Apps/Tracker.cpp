@@ -47,8 +47,8 @@ namespace Apps
         //cvMorphologyEx(back_img, back_img, 0, 0, CV_MOP_OPEN);
         //cvMorphologyEx(back_img, back_img, 0, 0, CV_MOP_CLOSE);
         
-        // XXX: do we need it?
-        //GaussianBlur(backProject, backProject, backProject.size());
+        // smoothing is really important to detect "rough" contour
+        GaussianBlur(backProject, backProject, Size(3,3), 1, 1);
         
         vector<vector<Point> > contours;
         vector<Vec4i> hierarchy;
@@ -62,20 +62,20 @@ namespace Apps
 #if DEBUG
             drawContours(img, contours, i, Scalar(255, 255, 255), 2, 8, hierarchy, 0, Point(0, 0));
 #endif
-            // printf("draw bounding: %d %d %d %d\n", rect.x, rect.y, rect.width, rect.height);
+            // LOGD("draw bounding: %d %d %d %d\n", rect.x, rect.y, rect.width, rect.height);
             double area = contourArea(contours[i]);
             if (area > maxArea) {
                 maxRect = rect;
                 maxArea = area;
             }
-            //printf("area: %f\n", area);
+            //LOGD("area: %f\n", area);
         }
         
         if (maxArea > AREA_THRESHOLD) {
-            //printf("find! %f\n", maxArea);
+            //LOGD("find! %f\n", maxArea);
             *find = 1;
         } else {
-            //printf("not find... %f\n", maxArea);
+            //LOGD("not find... %f\n", maxArea);
             *find = 0;
         }
         return maxRect;
@@ -89,12 +89,19 @@ namespace Apps
     }
 
     void Tracker::init () {
-        wRatio = (double)WIDTH / (double)IN_WIDTH;
-        hRatio = (double)HEIGHT / (double)IN_HEIGHT;
+        setSize(IN_WIDTH, IN_HEIGHT, WIDTH, HEIGHT);
 
         //Gesture1 gesture1 = Gesture1();
+        gestureLight = new GestureLight();
         draw = new Draw();
         //PaperDraw paperDraw = PaperDraw();
+    }
+
+    void Tracker::setSize(int srcWidth, int srcHeight, int destWidth, int destHeight) {
+        srcSize = Size(srcWidth, srcHeight);
+        destSize = Size(destWidth, destHeight);
+        wRatio = (double)destWidth / (double)srcWidth;
+        hRatio = (double)destHeight / (double)srcHeight;
     }
 
     Tracker::Tracker (string imageFileName) {
@@ -123,8 +130,7 @@ namespace Apps
         //cvFlip (frame, frame, 1);
         //dst = frame;
 
-        //src.copyTo(dst);
-        resize(src, dst, Size(WIDTH, HEIGHT));
+        resize(src, dst, destSize);
 
 
         int rFind = 0;
@@ -133,7 +139,7 @@ namespace Apps
         //CvRect yRect = findMarker(dst, frame_planes, yHist, &yFind);
         Rect yRect = Rect(0,0,0,0);
 
-        printf("R=%d Y=%d\n", rFind, yFind);
+        LOGD("R=%d Y=%d\n", rFind, yFind);
 
         Point rc = center(rRect);
         rc.x = rc.x * wRatio; rc.y = rc.y * hRatio;
@@ -150,6 +156,7 @@ namespace Apps
         Point zp = Point(0,0);
         //gesture1.trackMarker(dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
         //gunman.trackMarker(dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
+        gestureLight->trackMarker(dst, rc, yc, zp, zp);
         draw->trackMarker(dst, rc, yc, zp, zp);
         //paperDraw.trackMarker(frame, dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
     }

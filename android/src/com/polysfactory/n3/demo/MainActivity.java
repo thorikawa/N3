@@ -5,50 +5,52 @@ import java.io.File;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
-import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
 public class MainActivity extends Activity implements CvCameraViewListener2 {
 
-    static {
-        if (!OpenCVLoader.initDebug()) {
-            // Handle initialization error
-        } else {
-            System.loadLibrary("n3_apps");
-            System.loadLibrary("n3");
-        }
-    }
-
-    private static final String TAG = "OCVSample::Activity";
-
-    private Mat mRgba;
-    private Mat mGray;
+    private static final int REQUEST_MARKER_CAPTURE = 100;
+    private Mat mFrame;
     private N3 mNativeDetector;
 
     private CameraBridgeViewBase mOpenCvCameraView;
 
     private File mMarkerImage;
+    private MenuItem mCaptureMenu;
+    private ImageView mMarkerPreview;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.i(TAG, "called onCreate");
+        Log.i(L.TAG, "called onCreate");
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        setContentView(R.layout.face_detect_surface_view);
+        setContentView(R.layout.marker_tracking);
 
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.fd_activity_surface_view);
+        mOpenCvCameraView.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_FRONT);
         mOpenCvCameraView.setCvCameraViewListener(this);
 
-        mMarkerImage = IOUtils.copy(this, R.raw.rby0610, "images", "rby0610.jpg");
+        mMarkerPreview = (ImageView) findViewById(R.id.marker_preview);
+
+        mMarkerImage = IOUtils.getFilePath(this, Constants.MARKER_FILE_DIR, Constants.MARKER_FILE_NAME);
+        if (!mMarkerImage.exists()) {
+            IOUtils.copy(this, Constants.DEFAULT_MARKER_IMAGE_RES, mMarkerImage);
+        }
+        Bitmap marker = BitmapFactory.decodeFile(mMarkerImage.getAbsolutePath());
+        mMarkerPreview.setImageBitmap(marker);
     }
 
     @Override
@@ -79,39 +81,48 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     }
 
     public void onCameraViewStarted(int width, int height) {
-        mGray = new Mat();
-        mRgba = new Mat();
+        mFrame = new Mat();
+        mNativeDetector.setSize(width, height, width, height);
     }
 
     public void onCameraViewStopped() {
-        mGray.release();
-        mRgba.release();
+        // XXX: do we need it??
+        mFrame.release();
     }
 
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
 
-        mRgba = inputFrame.rgba();
-        mGray = inputFrame.gray();
-        Log.d(TAG, "cols:" + mRgba.cols());
-        Log.d(TAG, "rows:" + mRgba.rows());
+        Log.d(L.TAG, "main:oncamera frame");
+
+        mFrame = inputFrame.rgba();
 
         if (mNativeDetector != null) {
-            mNativeDetector.process(mGray, mRgba);
+            mNativeDetector.process(mFrame);
         }
 
-        return mRgba;
+        return mFrame;
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Log.i(TAG, "called onCreateOptionsMenu");
+        mCaptureMenu = menu.add(R.string.capture_marker);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Log.i(TAG, "called onOptionsItemSelected; selected item: " + item);
+        if (mCaptureMenu == item) {
+            Intent intent = new Intent(this, CaptureActivity.class);
+            startActivityForResult(intent, REQUEST_MARKER_CAPTURE);
+        }
         return true;
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (REQUEST_MARKER_CAPTURE == requestCode) {
+            // TODO reload marker
+        }
+    }
 }

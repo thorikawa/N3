@@ -6,11 +6,6 @@
 #include <string>
 #include <vector>
 
-#include <android/log.h>
-
-#define LOG_TAG "N3/Native"
-#define LOGD(...) ((void)__android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__))
-
 using namespace std;
 using namespace cv;
 using namespace Apps;
@@ -26,7 +21,7 @@ JNIEXPORT jlong JNICALL Java_com_polysfactory_n3_demo_N3_nativeCreateObject(
     string stdFileName(jnamestr);
 	jlong tracker;
 	try {
-		tracker = (jlong) new Tracker(stdFileName);
+		tracker = (jlong) new Tracker(stdFileName, stdFileName);
 	} catch (cv::Exception& e) {
 		LOGD("nativeCreateObject caught cv::Exception: %s", e.what());
 		jclass je = jenv->FindClass("org/opencv/core/CvException");
@@ -103,7 +98,7 @@ JNIEXPORT void JNICALL Java_com_polysfactory_n3_demo_N3_nativeStop(
 }
 
 JNIEXPORT void JNICALL Java_com_polysfactory_n3_demo_N3_nativeProcess(
-		JNIEnv * jenv, jclass, jlong thiz, jlong imageGray, jlong imageRgba) {
+		JNIEnv * jenv, jclass, jlong thiz, jlong imageRgba) {
 	LOGD("Java_com_polysfactory_n3_demo_N3_nativeDetect enter");
 	try {
 		((Tracker*)thiz)->process(*((Mat*)imageRgba), *((Mat*)imageRgba));
@@ -120,4 +115,22 @@ JNIEXPORT void JNICALL Java_com_polysfactory_n3_demo_N3_nativeProcess(
 				"Unknown exception in JNI code {highgui::VideoCapture_n_1VideoCapture__()}");
 	}
 	LOGD("Java_com_polysfactory_n3_demo_N3_nativeDetect exit");
+}
+
+JNIEXPORT void JNICALL Java_com_polysfactory_n3_demo_N3_nativeSetSize
+  (JNIEnv * jenv, jclass, jlong thiz, jint srcWidth, jint srcHeight, jint destWidth, jint destHeight) {
+	try {
+		((Tracker*)thiz)->setSize((int)srcWidth, (int)srcHeight, (int)destWidth, (int)destHeight);
+	} catch (cv::Exception& e) {
+		LOGD("nativeCreateObject caught cv::Exception: %s", e.what());
+		jclass je = jenv->FindClass("org/opencv/core/CvException");
+		if (!je)
+			je = jenv->FindClass("java/lang/Exception");
+		jenv->ThrowNew(je, e.what());
+	} catch (...) {
+		LOGD("nativeDetect caught unknown exception");
+		jclass je = jenv->FindClass("java/lang/Exception");
+		jenv->ThrowNew(je,
+				"Unknown exception in JNI code {highgui::VideoCapture_n_1VideoCapture__()}");
+	}
 }

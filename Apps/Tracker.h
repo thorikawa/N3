@@ -5,6 +5,7 @@
 #include <opencv2/legacy/compat.hpp>
 #include "../N3.h"
 #include "Draw.h"
+#include "GestureLight.h"
 
 using namespace std;
 using namespace cv;
@@ -16,14 +17,18 @@ namespace Apps
         MatND rHist;
         MatND yHist;
         Draw* draw;
+        GestureLight* gestureLight;
         double wRatio;
         double hRatio;
         void init ();
+        Size srcSize;
+        Size destSize;
     public:
         Tracker(string imageFileName);
         Tracker(string rMarkerImage, string yMarkerImage);
         ~Tracker();
         void process (Mat &src, Mat &dst);
+        void setSize(int srcWidth, int srcHeight, int destWidth, int destHeight);
   };
 }
 

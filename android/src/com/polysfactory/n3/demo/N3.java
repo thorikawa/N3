@@ -15,13 +15,17 @@ public class N3 {
         nativeStop(mNativeObj);
     }
 
-    public void process(Mat imageGray, Mat imageRgba) {
-        nativeProcess(mNativeObj, imageGray.getNativeObjAddr(), imageRgba.getNativeObjAddr());
+    public void process(Mat imageRgba) {
+        nativeProcess(mNativeObj, imageRgba.getNativeObjAddr());
     }
 
     public void release() {
         nativeDestroyObject(mNativeObj);
         mNativeObj = 0;
+    }
+
+    public void setSize(int srcWidth, int srcHeight, int destWidth, int destHeight) {
+        nativeSetSize(mNativeObj, srcWidth, srcHeight, destWidth, destHeight);
     }
 
     private long mNativeObj = 0;
@@ -34,5 +38,7 @@ public class N3 {
 
     private static native void nativeStop(long thiz);
 
-    private static native void nativeProcess(long thiz, long imageGray, long imageRgba);
+    private static native void nativeProcess(long thiz, long imageRgba);
+
+    private static native void nativeSetSize(long thiz, int srcWidth, int srcHeight, int destWidth, int destHeight);
 }
