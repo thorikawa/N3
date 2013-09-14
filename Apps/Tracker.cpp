@@ -62,20 +62,20 @@ namespace Apps
 #if DEBUG
             drawContours(img, contours, i, Scalar(255, 255, 255), 2, 8, hierarchy, 0, Point(0, 0));
 #endif
-            // printf("draw bounding: %d %d %d %d\n", rect.x, rect.y, rect.width, rect.height);
+            // LOGD("draw bounding: %d %d %d %d\n", rect.x, rect.y, rect.width, rect.height);
             double area = contourArea(contours[i]);
             if (area > maxArea) {
                 maxRect = rect;
                 maxArea = area;
             }
-            //printf("area: %f\n", area);
+            //LOGD("area: %f\n", area);
         }
         
         if (maxArea > AREA_THRESHOLD) {
-            //printf("find! %f\n", maxArea);
+            //LOGD("find! %f\n", maxArea);
             *find = 1;
         } else {
-            //printf("not find... %f\n", maxArea);
+            //LOGD("not find... %f\n", maxArea);
             *find = 0;
         }
         return maxRect;
@@ -133,7 +133,7 @@ namespace Apps
         //CvRect yRect = findMarker(dst, frame_planes, yHist, &yFind);
         Rect yRect = Rect(0,0,0,0);
 
-        printf("R=%d Y=%d\n", rFind, yFind);
+        LOGD("R=%d Y=%d\n", rFind, yFind);
 
         Point rc = center(rRect);
         rc.x = rc.x * wRatio; rc.y = rc.y * hRatio;

@@ -11,6 +11,7 @@ include /Users/poly/workspace/OpenCV-2.4.6-android-sdk/sdk/native/jni/OpenCV.mk
 
 LOCAL_SRC_FILES = Tracker.cpp Draw.cpp
 LOCAL_C_INCLUDES += $(LOCAL_PATH) $(LOCAL_PATH)/.. $(LOCAL_PATH)/../Box2D
+LOCAL_LDLIBS     += -llog -ldl
 LOCAL_MODULE := n3_apps
 include $(BUILD_SHARED_LIBRARY)
 
