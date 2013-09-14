@@ -120,7 +120,7 @@ JNIEXPORT void JNICALL Java_com_polysfactory_n3_demo_N3_nativeProcess(
 JNIEXPORT void JNICALL Java_com_polysfactory_n3_demo_N3_nativeSetSize
   (JNIEnv * jenv, jclass, jlong thiz, jint srcWidth, jint srcHeight, jint destWidth, jint destHeight) {
 	try {
-		((Tracker*)thiz)->setSize((int)srcWidth, (int)srcWidth, (int)destWidth, (int)destHeight);
+		((Tracker*)thiz)->setSize((int)srcWidth, (int)srcHeight, (int)destWidth, (int)destHeight);
 	} catch (cv::Exception& e) {
 		LOGD("nativeCreateObject caught cv::Exception: %s", e.what());
 		jclass je = jenv->FindClass("org/opencv/core/CvException");
