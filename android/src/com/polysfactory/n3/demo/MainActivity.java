@@ -26,9 +26,9 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
 
     private CameraBridgeViewBase mOpenCvCameraView;
 
-    private File mMarkerImage;
     private MenuItem mCaptureMenu;
     private ImageView mMarkerPreview;
+    private MenuItem mCaptureBlueMenu;
 
     /** Called when the activity is first created. */
     @Override
@@ -45,11 +45,13 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
 
         mMarkerPreview = (ImageView) findViewById(R.id.marker_preview);
 
-        mMarkerImage = IOUtils.getFilePath(this, Constants.MARKER_FILE_DIR, Constants.MARKER_FILE_NAME);
-        if (!mMarkerImage.exists()) {
-            IOUtils.copy(this, Constants.DEFAULT_MARKER_IMAGE_RES, mMarkerImage);
+        for (Marker marker : Marker.values()) {
+            File markerFile = marker.getFile(this);
+            if (!markerFile.exists()) {
+                IOUtils.copy(this, Constants.DEFAULT_MARKER_IMAGE_RES, markerFile);
+            }
         }
-        Bitmap marker = BitmapFactory.decodeFile(mMarkerImage.getAbsolutePath());
+        Bitmap marker = BitmapFactory.decodeFile(Marker.RED.getFilePath(this));
         mMarkerPreview.setImageBitmap(marker);
     }
 
@@ -68,7 +70,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     @Override
     public void onResume() {
         super.onResume();
-        mNativeDetector = new N3(mMarkerImage.getAbsolutePath());
+        mNativeDetector = new N3(Marker.RED.getFilePath(this), Marker.BLUE.getFilePath(this));
         mNativeDetector.start();
         if (mOpenCvCameraView != null) {
             mOpenCvCameraView.enableView();
@@ -106,6 +108,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         mCaptureMenu = menu.add(R.string.capture_marker);
+        mCaptureBlueMenu = menu.add(R.string.capture_blue);
         return true;
     }
 
@@ -113,6 +116,11 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (mCaptureMenu == item) {
             Intent intent = new Intent(this, CaptureActivity.class);
+            intent.putExtra(CaptureActivity.EXTRA_KEY_MARKER, Marker.RED);
+            startActivityForResult(intent, REQUEST_MARKER_CAPTURE);
+        } else if (mCaptureBlueMenu == item) {
+            Intent intent = new Intent(this, CaptureActivity.class);
+            intent.putExtra(CaptureActivity.EXTRA_KEY_MARKER, Marker.BLUE);
             startActivityForResult(intent, REQUEST_MARKER_CAPTURE);
         }
         return true;

@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     com_polysfactory_n3_demo_N3
  * Method:    nativeCreateObject
- * Signature: (Ljava/lang/String;)J
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)J
  */
 JNIEXPORT jlong JNICALL Java_com_polysfactory_n3_demo_N3_nativeCreateObject
-  (JNIEnv *, jclass, jstring);
+  (JNIEnv *, jclass, jstring, jstring);
 
 /*
  * Class:     com_polysfactory_n3_demo_N3

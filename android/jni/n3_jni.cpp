@@ -15,13 +15,13 @@ inline void vector_Rect_to_Mat(vector<Rect>& v_rect, Mat& mat) {
 }
 
 JNIEXPORT jlong JNICALL Java_com_polysfactory_n3_demo_N3_nativeCreateObject(
-		JNIEnv * jenv, jclass, jstring jFileName) {
+		JNIEnv * jenv, jclass, jstring jRedMarker, jstring jBlueMarker) {
 	LOGD("Java_com_polysfactory_n3_demo_N3_nativeCreateObject enter");
-    const char* jnamestr = jenv->GetStringUTFChars(jFileName, NULL);
-    string stdFileName(jnamestr);
+    const char* redMarker = jenv->GetStringUTFChars(jRedMarker, NULL);
+    const char* blueMarker = jenv->GetStringUTFChars(jBlueMarker, NULL);
 	jlong tracker;
 	try {
-		tracker = (jlong) new Tracker(stdFileName, stdFileName);
+		tracker = (jlong) new Tracker(string(redMarker), string(blueMarker));
 	} catch (cv::Exception& e) {
 		LOGD("nativeCreateObject caught cv::Exception: %s", e.what());
 		jclass je = jenv->FindClass("org/opencv/core/CvException");

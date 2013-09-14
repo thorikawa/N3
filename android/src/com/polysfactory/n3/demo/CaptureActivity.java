@@ -60,6 +60,9 @@ public class CaptureActivity extends Activity implements CvCameraViewListener2, 
     CameraBridgeViewBase mOpenCvCameraView;
 
     private File mMarkerFile;
+    private Marker mMarker;
+
+    public static final String EXTRA_KEY_MARKER = "marker";
 
     /** Called when the activity is first created. */
     @Override
@@ -81,7 +84,8 @@ public class CaptureActivity extends Activity implements CvCameraViewListener2, 
         mOpenCvCameraView.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_FRONT);
         mOpenCvCameraView.setOnTouchListener(this);
 
-        mMarkerFile = IOUtils.getFilePath(this, Constants.MARKER_FILE_DIR, Constants.MARKER_FILE_NAME);
+        mMarker = (Marker) getIntent().getSerializableExtra(EXTRA_KEY_MARKER);
+        mMarkerFile = mMarker.getFile(this);
 
         startCameraMode();
     }

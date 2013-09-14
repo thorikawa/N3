@@ -3,8 +3,8 @@ package com.polysfactory.n3.demo;
 import org.opencv.core.Mat;
 
 public class N3 {
-    public N3(String markerFileName) {
-        mNativeObj = nativeCreateObject(markerFileName);
+    public N3(String redMarker, String blueMarker) {
+        mNativeObj = nativeCreateObject(redMarker, blueMarker);
     }
 
     public void start() {
@@ -30,7 +30,7 @@ public class N3 {
 
     private long mNativeObj = 0;
 
-    private static native long nativeCreateObject(String markerFileName);
+    private static native long nativeCreateObject(String redMarker, String blueMarker);
 
     private static native void nativeDestroyObject(long thiz);
 
