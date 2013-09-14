@@ -92,6 +92,7 @@ namespace Apps
         setSize(IN_WIDTH, IN_HEIGHT, WIDTH, HEIGHT);
 
         //Gesture1 gesture1 = Gesture1();
+        gestureLight = new GestureLight();
         draw = new Draw();
         //PaperDraw paperDraw = PaperDraw();
     }
@@ -155,6 +156,7 @@ namespace Apps
         Point zp = Point(0,0);
         //gesture1.trackMarker(dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
         //gunman.trackMarker(dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
+        gestureLight->trackMarker(dst, rc, yc, zp, zp);
         draw->trackMarker(dst, rc, yc, zp, zp);
         //paperDraw.trackMarker(frame, dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
     }
