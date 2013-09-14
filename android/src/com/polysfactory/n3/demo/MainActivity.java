@@ -20,6 +20,7 @@ import android.widget.ImageView;
 
 public class MainActivity extends Activity implements CvCameraViewListener2 {
 
+    private static final int REQUEST_MARKER_CAPTURE = 100;
     private Mat mFrame;
     private N3 mNativeDetector;
 
@@ -39,6 +40,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         setContentView(R.layout.marker_tracking);
 
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.fd_activity_surface_view);
+        mOpenCvCameraView.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_FRONT);
         mOpenCvCameraView.setCvCameraViewListener(this);
 
         mMarkerPreview = (ImageView) findViewById(R.id.marker_preview);
@@ -80,6 +82,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
 
     public void onCameraViewStarted(int width, int height) {
         mFrame = new Mat();
+        mNativeDetector.setSize(width, height, width, height);
     }
 
     public void onCameraViewStopped() {
@@ -110,8 +113,16 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (mCaptureMenu == item) {
             Intent intent = new Intent(this, CaptureActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, REQUEST_MARKER_CAPTURE);
         }
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (REQUEST_MARKER_CAPTURE == requestCode) {
+            // TODO reload marker
+        }
     }
 }

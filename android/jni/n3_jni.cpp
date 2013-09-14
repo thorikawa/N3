@@ -116,3 +116,21 @@ JNIEXPORT void JNICALL Java_com_polysfactory_n3_demo_N3_nativeProcess(
 	}
 	LOGD("Java_com_polysfactory_n3_demo_N3_nativeDetect exit");
 }
+
+JNIEXPORT void JNICALL Java_com_polysfactory_n3_demo_N3_nativeSetSize
+  (JNIEnv * jenv, jclass, jlong thiz, jint srcWidth, jint srcHeight, jint destWidth, jint destHeight) {
+	try {
+		((Tracker*)thiz)->setSize((int)srcWidth, (int)srcWidth, (int)destWidth, (int)destHeight);
+	} catch (cv::Exception& e) {
+		LOGD("nativeCreateObject caught cv::Exception: %s", e.what());
+		jclass je = jenv->FindClass("org/opencv/core/CvException");
+		if (!je)
+			je = jenv->FindClass("java/lang/Exception");
+		jenv->ThrowNew(je, e.what());
+	} catch (...) {
+		LOGD("nativeDetect caught unknown exception");
+		jclass je = jenv->FindClass("java/lang/Exception");
+		jenv->ThrowNew(je,
+				"Unknown exception in JNI code {highgui::VideoCapture_n_1VideoCapture__()}");
+	}
+}

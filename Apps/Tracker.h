@@ -19,11 +19,14 @@ namespace Apps
         double wRatio;
         double hRatio;
         void init ();
+        Size srcSize;
+        Size destSize;
     public:
         Tracker(string imageFileName);
         Tracker(string rMarkerImage, string yMarkerImage);
         ~Tracker();
         void process (Mat &src, Mat &dst);
+        void setSize(int srcWidth, int srcHeight, int destWidth, int destHeight);
   };
 }
 

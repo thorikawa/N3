@@ -24,6 +24,10 @@ public class N3 {
         mNativeObj = 0;
     }
 
+    public void setSize(int srcWidth, int srcHeight, int destWidth, int destHeight) {
+        nativeSetSize(mNativeObj, srcWidth, srcHeight, destWidth, destHeight);
+    }
+
     private long mNativeObj = 0;
 
     private static native long nativeCreateObject(String markerFileName);
@@ -35,4 +39,6 @@ public class N3 {
     private static native void nativeStop(long thiz);
 
     private static native void nativeProcess(long thiz, long imageRgba);
+
+    private static native void nativeSetSize(long thiz, int srcWidth, int srcHeight, int destWidth, int destHeight);
 }

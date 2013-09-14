@@ -78,6 +78,7 @@ public class CaptureActivity extends Activity implements CvCameraViewListener2, 
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_view);
 
         mOpenCvCameraView.setCvCameraViewListener(this);
+        mOpenCvCameraView.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_FRONT);
         mOpenCvCameraView.setOnTouchListener(this);
 
         mMarkerFile = IOUtils.getFilePath(this, Constants.MARKER_FILE_DIR, Constants.MARKER_FILE_NAME);
@@ -259,7 +260,8 @@ public class CaptureActivity extends Activity implements CvCameraViewListener2, 
             break;
         case R.id.button_select_done:
             finishSelecting();
-            finishActivity(100);
+            setResult(999);
+            finish();
             break;
         default:
             break;

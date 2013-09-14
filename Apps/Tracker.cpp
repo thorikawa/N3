@@ -89,12 +89,18 @@ namespace Apps
     }
 
     void Tracker::init () {
-        wRatio = (double)WIDTH / (double)IN_WIDTH;
-        hRatio = (double)HEIGHT / (double)IN_HEIGHT;
+        setSize(IN_WIDTH, IN_HEIGHT, WIDTH, HEIGHT);
 
         //Gesture1 gesture1 = Gesture1();
         draw = new Draw();
         //PaperDraw paperDraw = PaperDraw();
+    }
+
+    void Tracker::setSize(int srcWidth, int srcHeight, int destWidth, int destHeight) {
+        srcSize = Size(srcWidth, srcHeight);
+        destSize = Size(destWidth, destHeight);
+        wRatio = (double)destWidth / (double)srcWidth;
+        hRatio = (double)destHeight / (double)srcHeight;
     }
 
     Tracker::Tracker (string imageFileName) {
@@ -123,8 +129,7 @@ namespace Apps
         //cvFlip (frame, frame, 1);
         //dst = frame;
 
-        src.copyTo(dst);
-        //resize(src, dst, Size(WIDTH, HEIGHT));
+        resize(src, dst, destSize);
 
 
         int rFind = 0;
