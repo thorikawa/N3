@@ -47,8 +47,8 @@ namespace Apps
         //cvMorphologyEx(back_img, back_img, 0, 0, CV_MOP_OPEN);
         //cvMorphologyEx(back_img, back_img, 0, 0, CV_MOP_CLOSE);
         
-        // XXX: do we need it?
-        //GaussianBlur(backProject, backProject, backProject.size());
+        // smoothing is really important to detect "rough" contour
+        GaussianBlur(backProject, backProject, Size(3,3), 1, 1);
         
         vector<vector<Point> > contours;
         vector<Vec4i> hierarchy;
