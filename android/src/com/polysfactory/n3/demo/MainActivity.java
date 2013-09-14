@@ -9,11 +9,14 @@ import org.opencv.core.Mat;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
 public class MainActivity extends Activity implements CvCameraViewListener2 {
 
@@ -24,6 +27,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
 
     private File mMarkerImage;
     private MenuItem mCaptureMenu;
+    private ImageView mMarkerPreview;
 
     /** Called when the activity is first created. */
     @Override
@@ -37,10 +41,14 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.fd_activity_surface_view);
         mOpenCvCameraView.setCvCameraViewListener(this);
 
+        mMarkerPreview = (ImageView) findViewById(R.id.marker_preview);
+
         mMarkerImage = IOUtils.getFilePath(this, Constants.MARKER_FILE_DIR, Constants.MARKER_FILE_NAME);
         if (!mMarkerImage.exists()) {
             IOUtils.copy(this, Constants.DEFAULT_MARKER_IMAGE_RES, mMarkerImage);
         }
+        Bitmap marker = BitmapFactory.decodeFile(mMarkerImage.getAbsolutePath());
+        mMarkerPreview.setImageBitmap(marker);
     }
 
     @Override
@@ -82,7 +90,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
 
         Log.d(L.TAG, "main:oncamera frame");
-        
+
         mFrame = inputFrame.rgba();
 
         if (mNativeDetector != null) {

@@ -5,8 +5,15 @@
 
     <org.opencv.android.JavaCameraView
         android:id="@+id/fd_activity_surface_view"
-        android:layout_width="600px"
-        android:layout_height="800px"
+        android:layout_width="600dp"
+        android:layout_height="480px"
         android:layout_gravity="top|center_horizontal" />
+
+    <ImageView
+        android:id="@+id/marker_preview"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="top|right"
+        android:scaleType="centerInside" />
 
 </FrameLayout>
