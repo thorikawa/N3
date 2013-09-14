@@ -136,8 +136,7 @@ namespace Apps
         int rFind = 0;
         int yFind = 0;
         Rect rRect = findMarker(src, rHist, &rFind);
-        //CvRect yRect = findMarker(dst, frame_planes, yHist, &yFind);
-        Rect yRect = Rect(0,0,0,0);
+        Rect yRect = findMarker(src, yHist, &yFind);
 
         LOGD("R=%d Y=%d\n", rFind, yFind);
 
