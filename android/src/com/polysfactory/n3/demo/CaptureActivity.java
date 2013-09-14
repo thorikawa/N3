@@ -204,7 +204,7 @@ public class CaptureActivity extends Activity implements CvCameraViewListener2, 
 
                 Rect roi = rectToCrop();
                 Log.d(L.TAG, "crop image:" + roi);
-                mCropped = image.submat(roi);
+                mCropped = mCaptured.submat(roi);
 
                 break;
             }
