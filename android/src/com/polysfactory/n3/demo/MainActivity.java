@@ -5,18 +5,22 @@ import java.io.File;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
+import org.opencv.android.Utils;
 import org.opencv.core.Mat;
+import org.opencv.highgui.Highgui;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
+import android.widget.LinearLayout;
 
 public class MainActivity extends Activity implements CvCameraViewListener2 {
 
@@ -27,7 +31,6 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     private CameraBridgeViewBase mOpenCvCameraView;
 
     private MenuItem mCaptureMenu;
-    private ImageView mMarkerPreview;
     private MenuItem mCaptureBlueMenu;
 
     /** Called when the activity is first created. */
@@ -43,16 +46,30 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         mOpenCvCameraView.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_FRONT);
         mOpenCvCameraView.setCvCameraViewListener(this);
 
-        mMarkerPreview = (ImageView) findViewById(R.id.marker_preview);
+        ViewGroup markerPreview = (ViewGroup) findViewById(R.id.marker_preview_container);
 
         for (Marker marker : Marker.values()) {
             File markerFile = marker.getFile(this);
             if (!markerFile.exists()) {
                 IOUtils.copy(this, Constants.DEFAULT_MARKER_IMAGE_RES, markerFile);
             }
+
+            Mat mat = Highgui.imread(markerFile.getAbsolutePath());
+            Bitmap markerBitmap = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888);
+            Utils.matToBitmap(mat, markerBitmap);
+            //Bitmap markerBitmap = BitmapFactory.decodeFile(markerFile.getAbsolutePath());
+            ImageView imageView = new ImageView(this);
+            imageView.setMaxWidth(100);
+            imageView.setMaxHeight(100);
+            int width = 100;
+            int height = 100;
+            LinearLayout.LayoutParams parms = new LinearLayout.LayoutParams(width,height);
+            imageView.setLayoutParams(parms);
+            imageView.setScaleType(ScaleType.CENTER_INSIDE);
+            imageView.setImageBitmap(markerBitmap);
+            markerPreview.addView(imageView);
         }
-        Bitmap marker = BitmapFactory.decodeFile(Marker.RED.getFilePath(this));
-        mMarkerPreview.setImageBitmap(marker);
+
     }
 
     @Override
