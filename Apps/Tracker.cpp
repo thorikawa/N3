@@ -123,8 +123,8 @@ namespace Apps
         //cvFlip (frame, frame, 1);
         //dst = frame;
 
-        //src.copyTo(dst);
-        resize(src, dst, Size(WIDTH, HEIGHT));
+        src.copyTo(dst);
+        //resize(src, dst, Size(WIDTH, HEIGHT));
 
 
         int rFind = 0;

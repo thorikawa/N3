@@ -26,7 +26,7 @@ JNIEXPORT jlong JNICALL Java_com_polysfactory_n3_demo_N3_nativeCreateObject(
     string stdFileName(jnamestr);
 	jlong tracker;
 	try {
-		tracker = (jlong) new Tracker(stdFileName);
+		tracker = (jlong) new Tracker(stdFileName, stdFileName);
 	} catch (cv::Exception& e) {
 		LOGD("nativeCreateObject caught cv::Exception: %s", e.what());
 		jclass je = jenv->FindClass("org/opencv/core/CvException");

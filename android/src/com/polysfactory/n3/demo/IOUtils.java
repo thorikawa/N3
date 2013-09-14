@@ -7,12 +7,16 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import android.content.Context;
+import android.util.Log;
 
 public class IOUtils {
-    public static File copy(Context context, int res, String dirname, String filename) {
-        InputStream is = context.getResources().openRawResource(res);
+    public static File getFilePath(Context context, String dirname, String filename) {
         File cascadeDir = context.getDir(dirname, Context.MODE_PRIVATE);
-        File file = new File(cascadeDir, filename);
+        return new File(cascadeDir, filename);
+    }
+
+    public static boolean copy(Context context, int res, File file) {
+        InputStream is = context.getResources().openRawResource(res);
         FileOutputStream os = null;
         try {
             os = new FileOutputStream(file);
@@ -22,17 +26,19 @@ public class IOUtils {
                 os.write(buffer, 0, bytesRead);
             }
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            Log.e(L.TAG, "file copy error", e);
+            return false;
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(L.TAG, "file copy error", e);
+            return false;
         } finally {
             try {
                 is.close();
                 os.close();
             } catch (IOException e) {
-                // ignore
+                return false;
             }
         }
-        return file;
+        return true;
     }
 }
