@@ -83,6 +83,7 @@ public class CaptureActivity extends Activity implements CvCameraViewListener2, 
         mOpenCvCameraView.setCvCameraViewListener(this);
         mOpenCvCameraView.setCameraIndex(Constants.CAMERA_INDEX);
         mOpenCvCameraView.setOnTouchListener(this);
+        mOpenCvCameraView.setMaxFrameSize(400, 240);
 
         mMarker = (Marker) getIntent().getSerializableExtra(EXTRA_KEY_MARKER);
         mMarkerFile = mMarker.getFile(this);
