@@ -35,6 +35,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
 
     private MenuItem mCaptureRedMenu;
     private MenuItem mCaptureBlueMenu;
+    private ViewGroup mMarkerPreview;
 
     /** Called when the activity is first created. */
     @Override
@@ -50,38 +51,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         mOpenCvCameraView.setCvCameraViewListener(this);
         mOpenCvCameraView.setMaxFrameSize(400, 240);
 
-        ViewGroup markerPreview = (ViewGroup) findViewById(R.id.marker_preview_container);
-
-        for (final Marker marker : Marker.values()) {
-            File markerFile = marker.getFile(this);
-            if (!markerFile.exists()) {
-                IOUtils.copy(this, Constants.DEFAULT_MARKER_IMAGE_RES, markerFile);
-            }
-
-            Mat mat = Highgui.imread(markerFile.getAbsolutePath());
-            Bitmap markerBitmap = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888);
-            Utils.matToBitmap(mat, markerBitmap);
-            ImageView imageView = new ImageView(this);
-            imageView.setMaxWidth(100);
-            imageView.setMaxHeight(100);
-            int width = 100;
-            int height = 100;
-            LinearLayout.LayoutParams parms = new LinearLayout.LayoutParams(width, height);
-            imageView.setLayoutParams(parms);
-            imageView.setScaleType(ScaleType.CENTER_INSIDE);
-            imageView.setImageBitmap(markerBitmap);
-            imageView.setFocusable(true);
-            imageView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
-                    intent.putExtra(CaptureActivity.EXTRA_KEY_MARKER, marker);
-                    startActivityForResult(intent, REQUEST_MARKER_CAPTURE);
-                }
-            });
-            markerPreview.addView(imageView);
-        }
-
+        mMarkerPreview = (ViewGroup) findViewById(R.id.marker_preview_container);
     }
 
     @Override
@@ -99,6 +69,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     @Override
     public void onResume() {
         super.onResume();
+        setupMarkerPreview();
         mNativeDetector = new N3(Marker.RED.getFilePath(this), Marker.BLUE.getFilePath(this));
         mNativeDetector.start();
         if (mOpenCvCameraView != null) {
@@ -164,6 +135,39 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         super.onActivityResult(requestCode, resultCode, data);
         if (REQUEST_MARKER_CAPTURE == requestCode) {
             // TODO reload marker
+        }
+    }
+
+    private void setupMarkerPreview() {
+        mMarkerPreview.removeAllViews();
+        for (final Marker marker : Marker.values()) {
+            File markerFile = marker.getFile(this);
+            if (!markerFile.exists()) {
+                IOUtils.copy(this, Constants.DEFAULT_MARKER_IMAGE_RES, markerFile);
+            }
+
+            Mat mat = Highgui.imread(markerFile.getAbsolutePath());
+            Bitmap markerBitmap = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888);
+            Utils.matToBitmap(mat, markerBitmap);
+            ImageView imageView = new ImageView(this);
+            imageView.setMaxWidth(100);
+            imageView.setMaxHeight(100);
+            int width = 100;
+            int height = 100;
+            LinearLayout.LayoutParams parms = new LinearLayout.LayoutParams(width, height);
+            imageView.setLayoutParams(parms);
+            imageView.setScaleType(ScaleType.CENTER_INSIDE);
+            imageView.setImageBitmap(markerBitmap);
+            imageView.setFocusable(true);
+            imageView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
+                    intent.putExtra(CaptureActivity.EXTRA_KEY_MARKER, marker);
+                    startActivityForResult(intent, REQUEST_MARKER_CAPTURE);
+                }
+            });
+            mMarkerPreview.addView(imageView);
         }
     }
 }
