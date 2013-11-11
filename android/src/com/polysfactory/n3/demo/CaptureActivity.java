@@ -5,7 +5,6 @@ import java.io.File;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
-import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -14,38 +13,25 @@ import org.opencv.core.Scalar;
 import org.opencv.highgui.Highgui;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.view.WindowManager;
 import android.widget.Button;
 
-public class CaptureActivity extends Activity implements CvCameraViewListener2, OnTouchListener, OnClickListener {
+public class CaptureActivity extends Activity implements CvCameraViewListener2, OnClickListener {
 
     // for marker detecting
-    private boolean mDrag = false;
-    private boolean mSelectFlag = false;
-    private Point mPointSrc, mPointDest;
-    private Mat mCropped;
     private static final int LINE_WIDTH = 3;
-    private int inWidth;
-    private int inHeight;
-    private Paint paint = new Paint();
 
-    Button finishCaptureButton;
+    private Button finishCaptureButton;
 
-    Button captureAgainButton;
+    private Button captureAgainButton;
 
-    Button finishSelectButton;
+    private Button finishSelectButton;
 
     enum State {
         CAMERA, SELECTING, TRACKING
@@ -57,7 +43,7 @@ public class CaptureActivity extends Activity implements CvCameraViewListener2, 
 
     private Mat mFrame;
 
-    CameraBridgeViewBase mOpenCvCameraView;
+    private CameraBridgeViewBase mOpenCvCameraView;
 
     private File mMarkerFile;
     private Marker mMarker;
@@ -82,7 +68,6 @@ public class CaptureActivity extends Activity implements CvCameraViewListener2, 
 
         mOpenCvCameraView.setCvCameraViewListener(this);
         mOpenCvCameraView.setCameraIndex(Constants.CAMERA_INDEX);
-        mOpenCvCameraView.setOnTouchListener(this);
         mOpenCvCameraView.setMaxFrameSize(400, 240);
 
         mMarker = (Marker) getIntent().getSerializableExtra(EXTRA_KEY_MARKER);
@@ -114,9 +99,6 @@ public class CaptureActivity extends Activity implements CvCameraViewListener2, 
 
     public void onCameraViewStarted(int width, int height) {
         mFrame = new Mat();
-        inWidth = width;
-        inHeight = height;
-        mCacheBitmap = Bitmap.createBitmap(inWidth, inHeight, Bitmap.Config.ARGB_8888);
     }
 
     public void onCameraViewStopped() {
@@ -132,6 +114,7 @@ public class CaptureActivity extends Activity implements CvCameraViewListener2, 
             Core.flip(mFrame, mFrame, 1);
         }
         mCaptured = mFrame.clone();
+        Core.rectangle(mFrame, new Point(130, 90), new Point(190, 150), new Scalar(255, 0, 0), LINE_WIDTH, 8, 0);
 
         Log.d(L.TAG, "onCameraFrame col:" + mFrame.cols() + ", rows:" + mFrame.rows());
 
@@ -150,95 +133,9 @@ public class CaptureActivity extends Activity implements CvCameraViewListener2, 
         return true;
     }
 
-    private Rect rectToCrop() {
-        int left = normalizeX((int) Math.min(mPointSrc.x, mPointDest.x));
-        int right = normalizeX((int) Math.max(mPointSrc.x, mPointDest.x));
-        int top = normalizeY((int) Math.min(mPointSrc.y, mPointDest.y));
-        int bottom = normalizeY((int) Math.max(mPointSrc.y, mPointDest.y));
-        return new Rect(left, top, right - left, bottom - top);
-    }
-
-    private int normalizeX(int x) {
-        if (x < 0) {
-            return 0;
-        }
-        if (x > inWidth) {
-            return inWidth;
-        }
-        return x;
-    }
-
-    private int normalizeY(int y) {
-        if (y < 0) {
-            return 0;
-        }
-        if (y > inHeight) {
-            return inHeight;
-        }
-        return y;
-    }
-
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        if (mState == State.SELECTING) {
-            int x = (int) event.getX();
-            int y = (int) event.getY();
-            switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN: {
-                /* left button clicked. ROI selection begins */
-                mPointSrc = new Point(x, y);
-                mSelectFlag = false;
-                break;
-            }
-            case MotionEvent.ACTION_MOVE: {
-                /* mouse dragged. ROI being selected */
-                Log.d(L.TAG, "pre clone: cols:" + mCaptured.cols() + ", rows:" + mCaptured.rows());
-                Mat image = mCaptured.clone();
-                Log.d(L.TAG, "post clone: cols:" + image.cols() + ", rows:" + image.rows());
-                mPointDest = new Point(x, y);
-                Core.rectangle(image, mPointSrc, mPointDest, new Scalar(255, 0, 0), LINE_WIDTH, 8, 0);
-                drawOnCameraView(image);
-
-                mDrag = true;
-                break;
-            }
-            case MotionEvent.ACTION_UP: {
-                Mat image = mCaptured.clone();
-                mPointDest = new Point(x, y);
-                Core.rectangle(image, mPointSrc, mPointDest, new Scalar(255, 0, 0), LINE_WIDTH, 8, 0);
-                drawOnCameraView(image);
-
-                mDrag = false;
-                mSelectFlag = true;
-
-                Rect roi = rectToCrop();
-                Log.d(L.TAG, "crop image:" + roi);
-                mCropped = mCaptured.submat(roi);
-
-                break;
-            }
-            default:
-                break;
-            }
-        }
-        return true;
-    }
-
-    private Bitmap mCacheBitmap;
-
-    private synchronized void drawOnCameraView(Mat mat) {
-        Log.d(L.TAG, "col:" + mat.cols() + ", rows:" + mat.rows());
-        Log.d(L.TAG, "bmp w:" + mCacheBitmap.getWidth() + ", h:" + mCacheBitmap.getHeight());
-        Utils.matToBitmap(mat, mCacheBitmap);
-        SurfaceHolder holder = mOpenCvCameraView.getHolder();
-        Canvas canvas = holder.lockCanvas();
-        canvas.drawBitmap(mCacheBitmap, 0, 0, paint);
-        holder.unlockCanvasAndPost(canvas);
-    }
-
     private void startCameraMode() {
         mState = State.CAMERA;
-        // mOpenCvCameraView.enableView();
+        mOpenCvCameraView.enableView();
         captureAgainButton.setVisibility(View.GONE);
         finishCaptureButton.setVisibility(View.VISIBLE);
         finishSelectButton.setVisibility(View.GONE);
@@ -246,7 +143,8 @@ public class CaptureActivity extends Activity implements CvCameraViewListener2, 
 
     private void finishSelecting() {
         Log.d(L.TAG, "imwrite");
-        Highgui.imwrite(mMarkerFile.getAbsolutePath(), mCropped);
+        Mat cropped = mCaptured.submat(new Rect(130, 90, 60, 60));
+        Highgui.imwrite(mMarkerFile.getAbsolutePath(), cropped);
     }
 
     private void startSelectMode() {
@@ -275,5 +173,4 @@ public class CaptureActivity extends Activity implements CvCameraViewListener2, 
             break;
         }
     }
-
 }
