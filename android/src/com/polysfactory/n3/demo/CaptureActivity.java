@@ -81,7 +81,7 @@ public class CaptureActivity extends Activity implements CvCameraViewListener2, 
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_view);
 
         mOpenCvCameraView.setCvCameraViewListener(this);
-        mOpenCvCameraView.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_FRONT);
+        mOpenCvCameraView.setCameraIndex(Constants.CAMERA_INDEX);
         mOpenCvCameraView.setOnTouchListener(this);
 
         mMarker = (Marker) getIntent().getSerializableExtra(EXTRA_KEY_MARKER);
@@ -127,6 +127,9 @@ public class CaptureActivity extends Activity implements CvCameraViewListener2, 
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
 
         mFrame = inputFrame.rgba();
+        if (Constants.FLIP) {
+            Core.flip(mFrame, mFrame, 1);
+        }
         mCaptured = mFrame.clone();
 
         Log.d(L.TAG, "onCameraFrame col:" + mFrame.cols() + ", rows:" + mFrame.rows());

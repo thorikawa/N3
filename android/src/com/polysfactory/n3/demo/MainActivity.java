@@ -6,6 +6,7 @@ import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
 import org.opencv.android.Utils;
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.highgui.Highgui;
 
@@ -16,6 +17,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -30,7 +33,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
 
     private CameraBridgeViewBase mOpenCvCameraView;
 
-    private MenuItem mCaptureMenu;
+    private MenuItem mCaptureRedMenu;
     private MenuItem mCaptureBlueMenu;
 
     /** Called when the activity is first created. */
@@ -43,12 +46,13 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         setContentView(R.layout.marker_tracking);
 
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.fd_activity_surface_view);
-        mOpenCvCameraView.setCameraIndex(CameraBridgeViewBase.CAMERA_ID_FRONT);
+        mOpenCvCameraView.setCameraIndex(Constants.CAMERA_INDEX);
         mOpenCvCameraView.setCvCameraViewListener(this);
+        mOpenCvCameraView.setMaxFrameSize(400, 240);
 
         ViewGroup markerPreview = (ViewGroup) findViewById(R.id.marker_preview_container);
 
-        for (Marker marker : Marker.values()) {
+        for (final Marker marker : Marker.values()) {
             File markerFile = marker.getFile(this);
             if (!markerFile.exists()) {
                 IOUtils.copy(this, Constants.DEFAULT_MARKER_IMAGE_RES, markerFile);
@@ -57,16 +61,24 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
             Mat mat = Highgui.imread(markerFile.getAbsolutePath());
             Bitmap markerBitmap = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888);
             Utils.matToBitmap(mat, markerBitmap);
-            //Bitmap markerBitmap = BitmapFactory.decodeFile(markerFile.getAbsolutePath());
             ImageView imageView = new ImageView(this);
             imageView.setMaxWidth(100);
             imageView.setMaxHeight(100);
             int width = 100;
             int height = 100;
-            LinearLayout.LayoutParams parms = new LinearLayout.LayoutParams(width,height);
+            LinearLayout.LayoutParams parms = new LinearLayout.LayoutParams(width, height);
             imageView.setLayoutParams(parms);
             imageView.setScaleType(ScaleType.CENTER_INSIDE);
             imageView.setImageBitmap(markerBitmap);
+            imageView.setFocusable(true);
+            imageView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
+                    intent.putExtra(CaptureActivity.EXTRA_KEY_MARKER, marker);
+                    startActivityForResult(intent, REQUEST_MARKER_CAPTURE);
+                }
+            });
             markerPreview.addView(imageView);
         }
 
@@ -101,6 +113,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
 
     public void onCameraViewStarted(int width, int height) {
         mFrame = new Mat();
+        Log.d(L.TAG, "startsize:" + width + "," + height);
         mNativeDetector.setSize(width, height, width, height);
     }
 
@@ -114,6 +127,9 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         Log.d(L.TAG, "main:oncamera frame");
 
         mFrame = inputFrame.rgba();
+        if (Constants.FLIP) {
+            Core.flip(mFrame, mFrame, 1);
+        }
 
         if (mNativeDetector != null) {
             mNativeDetector.process(mFrame);
@@ -124,14 +140,14 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        mCaptureMenu = menu.add(R.string.capture_marker);
+        mCaptureRedMenu = menu.add(R.string.capture_marker);
         mCaptureBlueMenu = menu.add(R.string.capture_blue);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (mCaptureMenu == item) {
+        if (mCaptureRedMenu == item) {
             Intent intent = new Intent(this, CaptureActivity.class);
             intent.putExtra(CaptureActivity.EXTRA_KEY_MARKER, Marker.RED);
             startActivityForResult(intent, REQUEST_MARKER_CAPTURE);
