@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
@@ -43,6 +44,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         Log.i(L.TAG, "called onCreate");
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.marker_tracking);
 
@@ -143,7 +145,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         for (final Marker marker : Marker.values()) {
             File markerFile = marker.getFile(this);
             if (!markerFile.exists()) {
-                IOUtils.copy(this, Constants.DEFAULT_MARKER_IMAGE_RES, markerFile);
+                IOUtils.copy(this, marker.getDefaultRes(), markerFile);
             }
 
             Mat mat = Highgui.imread(markerFile.getAbsolutePath());

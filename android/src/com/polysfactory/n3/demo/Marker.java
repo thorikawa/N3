@@ -5,12 +5,15 @@ import java.io.File;
 import android.content.Context;
 
 public enum Marker {
-    RED("marker_red.jpg"), BLUE("marker_blue.jpg");
+    RED("marker_red.jpg", R.raw.red), BLUE("marker_blue.jpg", R.raw.blue);
 
     String filename;
 
-    Marker(String file) {
-        filename = file;
+    private int defaultRes;
+
+    Marker(String file, int defaultRes) {
+        this.filename = file;
+        this.defaultRes = defaultRes;
     }
 
     public File getFile(Context context) {
@@ -19,5 +22,9 @@ public enum Marker {
 
     public String getFilePath(Context context) {
         return this.getFile(context).getAbsolutePath();
+    }
+
+    public int getDefaultRes() {
+        return defaultRes;
     }
 }
