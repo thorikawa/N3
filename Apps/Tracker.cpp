@@ -1,5 +1,5 @@
 #include "Tracker.h"
-#define AREA_THRESHOLD 30
+#define AREA_THRESHOLD 200
 
 namespace Apps
 {
@@ -72,10 +72,10 @@ namespace Apps
         }
         
         if (maxArea > AREA_THRESHOLD) {
-            //LOGD("find! %f\n", maxArea);
+            LOGD("find! %f\n", maxArea);
             *find = 1;
         } else {
-            //LOGD("not find... %f\n", maxArea);
+            LOGD("not find... %f\n", maxArea);
             *find = 0;
         }
         return maxRect;
@@ -147,16 +147,32 @@ namespace Apps
 
         if(!rFind) rc.x = -1;
         if(!yFind) yc.x = -1;
-#if DEBUG
-        if(rFind) rectangle(dst, Point(rc.x-2, rc.y-2), Point(rc.x+2, rc.y+2), CV_RGB(255,0,0), 3);
-        if(yFind) rectangle(dst, Point(yc.x-2, yc.y-2), Point(yc.x+2, yc.y+2), CV_RGB(0,255,0), 3);
-#endif
+//#if DEBUG
+        if(rFind) rectangle(dst, rRect, CV_RGB(255,0,0), 3);
+        if(yFind) rectangle(dst, yRect, CV_RGB(0,255,0), 3);
+//#endif
 
         Point zp = Point(0,0);
         //gesture1.trackMarker(dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
         //gunman.trackMarker(dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
-        gestureLight->trackMarker(dst, rc, yc, zp, zp);
+        //gestureLight->trackMarker(dst, rc, yc, zp, zp);
         draw->trackMarker(dst, rc, yc, zp, zp);
         //paperDraw.trackMarker(frame, dst, rc, yc, cvPoint(0,0), cvPoint(0,0));
+    }
+
+    void Tracker::findMarkers (Mat& src, vector<Rect>& rRectVector, vector<Rect>& bRectVector) {
+        int rFind = 0;
+        int bFind = 0;
+        Rect rRect = findMarker(src, rHist, &rFind);
+        Rect bRect = findMarker(src, yHist, &bFind);
+        if (rFind) {
+            rRectVector.push_back(rRect);
+        }
+        if (bFind) {
+            bRectVector.push_back(bRect);
+        }
+        // rRect = 
+
+        LOGD("R=%d Y=%d\n", rFind, bFind);
     }
 }

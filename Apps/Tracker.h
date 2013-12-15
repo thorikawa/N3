@@ -28,6 +28,7 @@ namespace Apps
         Tracker(string rMarkerImage, string yMarkerImage);
         ~Tracker();
         void process (Mat &src, Mat &dst);
+        void findMarkers (Mat& src, vector<Rect>& rRect, vector<Rect>& bRect);
         void setSize(int srcWidth, int srcHeight, int destWidth, int destHeight);
   };
 }
