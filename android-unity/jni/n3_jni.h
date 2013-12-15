@@ -47,14 +47,13 @@ JNIEXPORT void JNICALL Java_com_polysfactory_n3_unity_N3_nativeStop
 JNIEXPORT void JNICALL Java_com_polysfactory_n3_unity_N3_nativeProcess
   (JNIEnv *, jclass, jlong, jlong);
 
-
 /*
  * Class:     com_polysfactory_n3_unity_N3
  * Method:    nativeFindMarkers
- * Signature: (JJ)V
+ * Signature: (JJJJ)V
  */
 JNIEXPORT void JNICALL Java_com_polysfactory_n3_unity_N3_nativeFindMarkers
-  (JNIEnv * jenv, jclass, jlong, jlong, jlong, jlong);
+  (JNIEnv *, jclass, jlong, jlong, jlong, jlong);
 
 /*
  * Class:     com_polysfactory_n3_unity_N3
