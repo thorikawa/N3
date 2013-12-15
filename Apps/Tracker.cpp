@@ -167,12 +167,14 @@ namespace Apps
         Rect bRect = findMarker(src, yHist, &bFind);
         if (rFind) {
             rRectVector.push_back(rRect);
+            rectangle(src, rRect, CV_RGB(255,0,0), 3);
         }
         if (bFind) {
             bRectVector.push_back(bRect);
+            rectangle(src, bRect, CV_RGB(0,255,0), 3);
         }
         // rRect = 
 
-        LOGD("R=%d Y=%d\n", rFind, bFind);
+        LOGD("R=%d B=%d\n", rFind, bFind);
     }
 }
