@@ -1,4 +1,4 @@
-package com.polysfactory.n3.unity;
+package com.polysfactory.n3.jni;
 
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;

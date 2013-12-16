@@ -34,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 
+import com.polysfactory.n3.jni.N3;
 import com.unity3d.player.UnityPlayer;
 
 public class MainActivity extends Activity implements CvCameraViewListener2 {
@@ -60,6 +61,8 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     private int mOffsetY;
     private int mHeight;
 
+    private boolean mUnityLoaded = false;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -75,6 +78,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         mCameraView.setCameraIndex(Constants.CAMERA_INDEX);
         mCameraView.setCvCameraViewListener(this);
         mCameraView.setMaxFrameSize(Constants.MAX_FRAME_SIZE_WIDTH, Constants.MAX_FRAME_SIZE_HEIGHT);
+        mCameraView.disableView();
 
         mMarkerPreview = (ViewGroup) findViewById(R.id.marker_preview_container);
 
@@ -114,13 +118,23 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     public void onResume() {
         super.onResume();
         setupMarkerPreview();
-        mNativeDetector = new N3(Marker.RED.getFilePath(this), Marker.BLUE.getFilePath(this));
-        mNativeDetector.start();
-        if (mCameraView != null) {
+        if (mUnityLoaded) {
+            mNativeDetector = new N3(Marker.RED.getFilePath(this), Marker.BLUE.getFilePath(this));
+            mNativeDetector.start();
             mCameraView.enableView();
         }
         if (mUnityPlayer != null) {
             mUnityPlayer.resume();
+        }
+    }
+
+    public void onUnityLoaded() {
+        Log.d(L.TAG, "onUnityLoaded");
+        if (!mUnityLoaded) {
+            mNativeDetector = new N3(Marker.RED.getFilePath(this), Marker.BLUE.getFilePath(this));
+            mNativeDetector.start();
+            mCameraView.enableView();
+            mUnityLoaded = true;
         }
     }
 
@@ -139,7 +153,6 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
         mOffsetX = (mCameraView.getWidth() - (int) (width * mScale)) / 2;
         mOffsetY = (mHeight - (int) (height * mScale)) / 2;
         Log.d(L.TAG, "offset:" + mOffsetX + "," + mOffsetY);
-        mNativeDetector.setSize(width, height, width, height);
     }
 
     public void onCameraViewStopped() {
@@ -256,6 +269,7 @@ public class MainActivity extends Activity implements CvCameraViewListener2 {
     class CustomUnityPlayer extends UnityPlayer {
         public CustomUnityPlayer(ContextWrapper context) {
             super(context);
+            currentActivity = MainActivity.this;
         }
 
         @Override

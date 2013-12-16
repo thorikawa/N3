@@ -14,9 +14,9 @@ inline void vector_Rect_to_Mat(vector<Rect>& v_rect, Mat& mat) {
 	mat = Mat(v_rect, true);
 }
 
-JNIEXPORT jlong JNICALL Java_com_polysfactory_n3_unity_N3_nativeCreateObject(
+JNIEXPORT jlong JNICALL Java_com_polysfactory_n3_jni_N3_nativeCreateObject(
 		JNIEnv * jenv, jclass, jstring jRedMarker, jstring jBlueMarker) {
-	LOGD("Java_com_polysfactory_n3_unity_N3_nativeCreateObject enter");
+	LOGD("Java_com_polysfactory_n3_jni_N3_nativeCreateObject enter");
 	const char* redMarker = jenv->GetStringUTFChars(jRedMarker, NULL);
 	const char* blueMarker = jenv->GetStringUTFChars(jBlueMarker, NULL);
 	jlong tracker;
@@ -36,13 +36,13 @@ JNIEXPORT jlong JNICALL Java_com_polysfactory_n3_unity_N3_nativeCreateObject(
 		return 0;
 	}
 
-	LOGD("Java_com_polysfactory_n3_unity_N3_nativeCreateObject exit");
+	LOGD("Java_com_polysfactory_n3_jni_N3_nativeCreateObject exit");
 	return tracker;
 }
 
-JNIEXPORT void JNICALL Java_com_polysfactory_n3_unity_N3_nativeDestroyObject(
+JNIEXPORT void JNICALL Java_com_polysfactory_n3_jni_N3_nativeDestroyObject(
 		JNIEnv * jenv, jclass, jlong thiz) {
-	LOGD("Java_com_polysfactory_n3_unity_N3_nativeDestroyObject enter");
+	LOGD("Java_com_polysfactory_n3_jni_N3_nativeDestroyObject enter");
 	try {
 	} catch (cv::Exception& e) {
 		LOGD("nativeestroyObject caught cv::Exception: %s", e.what());
@@ -56,12 +56,12 @@ JNIEXPORT void JNICALL Java_com_polysfactory_n3_unity_N3_nativeDestroyObject(
 		jenv->ThrowNew(je,
 				"Unknown exception in JNI code {highgui::VideoCapture_n_1VideoCapture__()}");
 	}
-	LOGD("Java_com_polysfactory_n3_unity_N3_nativeDestroyObject exit");
+	LOGD("Java_com_polysfactory_n3_jni_N3_nativeDestroyObject exit");
 }
 
-JNIEXPORT void JNICALL Java_com_polysfactory_n3_unity_N3_nativeStart(
+JNIEXPORT void JNICALL Java_com_polysfactory_n3_jni_N3_nativeStart(
 		JNIEnv * jenv, jclass, jlong thiz) {
-	LOGD("Java_com_polysfactory_n3_unity_N3_nativeStart enter");
+	LOGD("Java_com_polysfactory_n3_jni_N3_nativeStart enter");
 	try {
 	} catch (cv::Exception& e) {
 		LOGD("nativeStart caught cv::Exception: %s", e.what());
@@ -75,12 +75,12 @@ JNIEXPORT void JNICALL Java_com_polysfactory_n3_unity_N3_nativeStart(
 		jenv->ThrowNew(je,
 				"Unknown exception in JNI code {highgui::VideoCapture_n_1VideoCapture__()}");
 	}
-	LOGD("Java_com_polysfactory_n3_unity_N3_nativeStart exit");
+	LOGD("Java_com_polysfactory_n3_jni_N3_nativeStart exit");
 }
 
-JNIEXPORT void JNICALL Java_com_polysfactory_n3_unity_N3_nativeStop(
+JNIEXPORT void JNICALL Java_com_polysfactory_n3_jni_N3_nativeStop(
 		JNIEnv * jenv, jclass, jlong thiz) {
-	LOGD("Java_com_polysfactory_n3_unity_N3_nativeStop enter");
+	LOGD("Java_com_polysfactory_n3_jni_N3_nativeStop enter");
 	try {
 	} catch (cv::Exception& e) {
 		LOGD("nativeStop caught cv::Exception: %s", e.what());
@@ -94,12 +94,12 @@ JNIEXPORT void JNICALL Java_com_polysfactory_n3_unity_N3_nativeStop(
 		jenv->ThrowNew(je,
 				"Unknown exception in JNI code {highgui::VideoCapture_n_1VideoCapture__()}");
 	}
-	LOGD("Java_com_polysfactory_n3_unity_N3_nativeStop exit");
+	LOGD("Java_com_polysfactory_n3_jni_N3_nativeStop exit");
 }
 
-JNIEXPORT void JNICALL Java_com_polysfactory_n3_unity_N3_nativeProcess(
+JNIEXPORT void JNICALL Java_com_polysfactory_n3_jni_N3_nativeProcess(
 		JNIEnv * jenv, jclass, jlong thiz, jlong imageRgba) {
-	LOGD("Java_com_polysfactory_n3_unity_N3_nativeDetect enter");
+	LOGD("Java_com_polysfactory_n3_jni_N3_nativeDetect enter");
 	try {
 		((Tracker*) thiz)->process(*((Mat*) imageRgba), *((Mat*) imageRgba));
 	} catch (cv::Exception& e) {
@@ -114,13 +114,13 @@ JNIEXPORT void JNICALL Java_com_polysfactory_n3_unity_N3_nativeProcess(
 		jenv->ThrowNew(je,
 				"Unknown exception in JNI code {highgui::VideoCapture_n_1VideoCapture__()}");
 	}
-	LOGD("Java_com_polysfactory_n3_unity_N3_nativeDetect exit");
+	LOGD("Java_com_polysfactory_n3_jni_N3_nativeDetect exit");
 }
 
-JNIEXPORT void JNICALL Java_com_polysfactory_n3_unity_N3_nativeFindMarkers(
+JNIEXPORT void JNICALL Java_com_polysfactory_n3_jni_N3_nativeFindMarkers(
 		JNIEnv * jenv, jclass, jlong thiz, jlong imageRgba, jlong rRect,
 		jlong bRect) {
-	LOGD("Java_com_polysfactory_n3_unity_N3_nativeFindMarkers enter");
+	LOGD("Java_com_polysfactory_n3_jni_N3_nativeFindMarkers enter");
 	try {
 		//converters.h
 		//void Mat_to_vector_Rect(cv::Mat& mat, std::vector<cv::Rect>& v_rect);
@@ -144,10 +144,10 @@ JNIEXPORT void JNICALL Java_com_polysfactory_n3_unity_N3_nativeFindMarkers(
 		jenv->ThrowNew(je,
 				"Unknown exception in JNI code {highgui::VideoCapture_n_1VideoCapture__()}");
 	}
-	LOGD("Java_com_polysfactory_n3_unity_N3_nativeFindMarkers exit");
+	LOGD("Java_com_polysfactory_n3_jni_N3_nativeFindMarkers exit");
 }
 
-JNIEXPORT void JNICALL Java_com_polysfactory_n3_unity_N3_nativeSetSize(
+JNIEXPORT void JNICALL Java_com_polysfactory_n3_jni_N3_nativeSetSize(
 		JNIEnv * jenv, jclass, jlong thiz, jint srcWidth, jint srcHeight,
 		jint destWidth, jint destHeight) {
 	try {
