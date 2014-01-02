@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <com.polysfactory.n3.ar.MyCameraView
+    <org.opencv.android.JavaCameraViewEx
         android:id="@+id/fd_activity_surface_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -36,6 +36,12 @@ MarkerDetector::MarkerDetector(CameraCalibration calibration)
         m_markerCorners3d.push_back(cv::Point3f(+0.5f,-0.5f,0));
         m_markerCorners3d.push_back(cv::Point3f(+0.5f,+0.5f,0));
         m_markerCorners3d.push_back(cv::Point3f(-0.5f,+0.5f,0));
+        /*
+        m_markerCorners3d.push_back(cv::Point3f(-0.5f,+0.5f,0));
+        m_markerCorners3d.push_back(cv::Point3f(+0.5f,+0.5f,0));
+        m_markerCorners3d.push_back(cv::Point3f(+0.5f,-0.5f,0));
+        m_markerCorners3d.push_back(cv::Point3f(-0.5f,-0.5f,0));
+        */
     }
     else
     {
@@ -49,12 +55,20 @@ MarkerDetector::MarkerDetector(CameraCalibration calibration)
     m_markerCorners2d.push_back(cv::Point2f(markerSize.width-1,0));
     m_markerCorners2d.push_back(cv::Point2f(markerSize.width-1,markerSize.height-1));
     m_markerCorners2d.push_back(cv::Point2f(0,markerSize.height-1));
+    /*
+    m_markerCorners2d.push_back(cv::Point2f(0,markerSize.height-1));
+    m_markerCorners2d.push_back(cv::Point2f(markerSize.width-1,markerSize.height-1));
+    m_markerCorners2d.push_back(cv::Point2f(markerSize.width-1,0));
+    m_markerCorners2d.push_back(cv::Point2f(0,0));
+    */
 }
 
-void MarkerDetector::processFrame(const cv::Mat& bgraMat)
+void MarkerDetector::processFrame(const cv::Mat& bgraMat, float scale)
 {
+    cv::Mat resized;
+    cv::resize(bgraMat, resized, cv::Size(), scale, scale);
     std::vector<Marker> markers;
-    findMarkers(bgraMat, markers);
+    findMarkers(resized, markers);
 
     m_transformations.clear();
     for (size_t i=0; i<markers.size(); i++)
@@ -103,6 +117,14 @@ bool MarkerDetector::findMarkers(const cv::Mat& bgraMat, std::vector<Marker>& de
 
     // Find is them are markers
     recognizeMarkers(m_grayscaleImage, detectedMarkers);
+
+    // Fix the coord difference between OpenCV and Unity
+    for (size_t i=0; i<detectedMarkers.size(); i++) {
+        Marker& m = detectedMarkers[i];
+        for (size_t k=0; k<m.points.size(); k++) {
+            m.points[k].y = m_grayscaleImage.rows - m.points[k].y;
+        }
+    }
 
     // Calculate their poses
     estimatePosition(detectedMarkers);
@@ -204,8 +226,9 @@ void MarkerDetector::findCandidates
         // All tests are passed. Save marker candidate:
         Marker m;
 
-        for (int i = 0; i<4; i++)
+        for (int i = 0; i<4; i++) {
             m.points.push_back( cv::Point2f(approxCurve[i].x,approxCurve[i].y) );
+        }
 
         // Sort the points in anti-clockwise order
         // Trace a line between the first and second point.
@@ -215,8 +238,11 @@ void MarkerDetector::findCandidates
 
         double o = (v1.x * v2.y) - (v1.y * v2.x);
 
-        if (o < 0.0)		 //if the third point is in the left side, then sort in anti-clockwise order
+        if (o < 0.0) {
+        // if (o > 0.0) {
+            //if the third point is in the left side, then sort in anti-clockwise order
             std::swap(m.points[1], m.points[3]);
+        }
 
         possibleMarkers.push_back(m);
     }
@@ -366,15 +392,14 @@ void MarkerDetector::recognizeMarkers(const cv::Mat& grayscale, std::vector<Mark
 void MarkerDetector::estimatePosition(std::vector<Marker>& detectedMarkers)
 {
     for (size_t i=0; i<detectedMarkers.size(); i++)
-    {					
+    {
         Marker& m = detectedMarkers[i];
-
         cv::Mat Rvec;
         cv::Mat_<float> Tvec;
-        cv::Mat raux,taux;
-        cv::solvePnP(m_markerCorners3d, m.points, camMatrix, distCoeff,raux,taux);
-        raux.convertTo(Rvec,CV_32F);
-        taux.convertTo(Tvec ,CV_32F);
+        cv::Mat raux, taux;
+        cv::solvePnP(m_markerCorners3d, m.points, camMatrix, distCoeff, raux, taux);
+        raux.convertTo(Rvec, CV_32F);
+        taux.convertTo(Tvec, CV_32F);
 
         cv::Mat_<float> rotMat(3,3); 
         cv::Rodrigues(Rvec, rotMat);
@@ -384,12 +409,12 @@ void MarkerDetector::estimatePosition(std::vector<Marker>& detectedMarkers)
         {
             for (int row=0; row<3; row++)
             {        
-                m.transformation.r().mat[row][col] = rotMat(row,col); // Copy rotation component
+                m.transformation.r().mat[row][col] = rotMat(row, col); // Copy rotation component
             }
             m.transformation.t().data[col] = Tvec(col); // Copy translation component
         }
 
         // Since solvePnP finds camera location, w.r.t to marker pose, to get marker pose w.r.t to the camera we invert it.
-        m.transformation = m.transformation.getInverted();
+        // m.transformation = m.transformation.getInverted();
     }
 }

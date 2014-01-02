@@ -10,18 +10,18 @@ extern "C" {
 /*
  * Class:     com_polysfactory_n3_jni_NativeMarkerDetector
  * Method:    nativeCreateObject
- * Signature: ()J
+ * Signature: (FFFF)J
  */
 JNIEXPORT jlong JNICALL Java_com_polysfactory_n3_jni_NativeMarkerDetector_nativeCreateObject
-  (JNIEnv *, jobject);
+  (JNIEnv *, jobject, jfloat, jfloat, jfloat, jfloat);
 
 /*
  * Class:     com_polysfactory_n3_jni_NativeMarkerDetector
  * Method:    nativeFindMarkers
- * Signature: (JJJ)V
+ * Signature: (JJJF)V
  */
 JNIEXPORT void JNICALL Java_com_polysfactory_n3_jni_NativeMarkerDetector_nativeFindMarkers
-  (JNIEnv *, jobject, jlong, jlong, jlong);
+  (JNIEnv *, jobject, jlong, jlong, jlong, jfloat);
 
 /*
  * Class:     com_polysfactory_n3_jni_NativeMarkerDetector

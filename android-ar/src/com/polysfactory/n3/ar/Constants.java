@@ -21,6 +21,8 @@ public class Constants {
         FLIP = false;
     }
     // glass 640*360
-    public static final int MAX_FRAME_SIZE_WIDTH = 480;
-    public static final int MAX_FRAME_SIZE_HEIGHT = 270;
+    // public static final int MAX_FRAME_SIZE_WIDTH = 640;
+    // public static final int MAX_FRAME_SIZE_HEIGHT = 480;
+    public static final int MAX_FRAME_SIZE_WIDTH = 640;
+    public static final int MAX_FRAME_SIZE_HEIGHT = 360;
 }

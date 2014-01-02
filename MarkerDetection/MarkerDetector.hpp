@@ -44,7 +44,7 @@ public:
   MarkerDetector(CameraCalibration calibration);
   
   //! Searches for markes and fills the list of transformation for found markers
-  void processFrame(const cv::Mat& bgraMat);
+  void processFrame(const cv::Mat& bgraMat, float scale = 1.0F);
   
   const std::vector<Transformation>& getTransformations() const;
   

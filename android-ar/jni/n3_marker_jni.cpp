@@ -21,6 +21,9 @@ void vector_Transformation_to_Mat(vector<Transformation>& v_tr, Mat& mat) {
 	for (int i = 0; i < count; i++) {
 		Transformation tr = v_tr[i];
 		Matrix44 m44 = tr.getMat44();
+		for (int r=0; r<4; r++) {
+			LOGD("%f, %f, %f, %f", m44.mat[r][0], m44.mat[r][1], m44.mat[r][2], m44.mat[r][3]);
+		}
 		for (int j = 0; j < 16; j++) {
 			mat.at<float>(i, j) = m44.data[j];
 		}
@@ -72,13 +75,11 @@ void vector_Mat_to_Mat(std::vector<cv::Mat>& v_mat, cv::Mat& mat)
 #endif
 
 JNIEXPORT jlong JNICALL Java_com_polysfactory_n3_jni_NativeMarkerDetector_nativeCreateObject(
-		JNIEnv * jenv, jobject) {
+		JNIEnv * jenv, jobject, jfloat fx, jfloat fy, jfloat cx, jfloat cy) {
 	jlong detector;
 	try {
 		// TODO: this is iPad camera matrix...
-		CameraCalibration calib = CameraCalibration(
-				6.24860291e+02 * (640. / 352.), 6.24860291e+02 * (480. / 288.),
-				640 * 0.5f, 480 * 0.5f);
+		CameraCalibration calib = CameraCalibration((float)fx, (float)fy, (float)cx, (float)cy);
 		detector = (jlong) new MarkerDetector(calib);
 	} catch (...) {
 		LOGD("nativeCreateObject caught unknown exception");
@@ -92,12 +93,12 @@ JNIEXPORT jlong JNICALL Java_com_polysfactory_n3_jni_NativeMarkerDetector_native
 }
 
 JNIEXPORT void JNICALL Java_com_polysfactory_n3_jni_NativeMarkerDetector_nativeFindMarkers(
-		JNIEnv * jenv, jobject, jlong thiz, jlong imageBgra, jlong transMat) {
+		JNIEnv * jenv, jobject, jlong thiz, jlong imageBgra, jlong transMat, jfloat scale) {
 	try {
 		MarkerDetector* markerDetector = (MarkerDetector*) thiz;
 		Mat* image = (Mat*) imageBgra;
 		Mat* transMatObj = (Mat*) transMat;
-		markerDetector->processFrame(*image);
+		markerDetector->processFrame(*image, (float) scale);
 		std::vector<Transformation> transformations =
 				markerDetector->getTransformations();
 		vector_Transformation_to_Mat(transformations, *transMatObj);
