@@ -11,7 +11,9 @@ include /Users/poly/workspace/OpenCV-2.4.6-android-sdk/sdk/native/jni/OpenCV.mk
 
 LOCAL_SRC_FILES = CameraCalibration.cpp GeometryTypes.cpp Marker.cpp MarkerDetector.cpp TinyLA.cpp
 LOCAL_C_INCLUDES += $(LOCAL_PATH)
+LOCAL_CFLAGS    := -Werror -O3 -ffast-math
 LOCAL_LDLIBS     += -llog -ldl
+LOCAL_ARM_NEON := true
 LOCAL_MODULE := n3_marker
 include $(BUILD_SHARED_LIBRARY)
 
